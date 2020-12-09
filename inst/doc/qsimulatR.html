@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Johann Ostmeyer and Carsten Urbach" />
+
+
+<title>qsimulatR</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">qsimulatR</h1>
+<h4 class="author">Johann Ostmeyer and Carsten Urbach</h4>
+
+
+
+<div id="qsimulatr-package" class="section level1">
+<h1>qsimulatR Package</h1>
+<p>In this vignette we provide basic usage examples of the <code>qsimulatR</code> package.</p>
+<div id="a-quantum-state" class="section level2">
+<h2>A quantum state</h2>
+<p>The basis for the simulator is a quantum state, called <code>qstate</code> in <code>qsimulatR</code> realised as an S4 class. One can generate a <code>qstate</code> with a number of qubits as follows</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">x &lt;-<span class="st"> </span><span class="kw">qstate</span>(<span class="dt">nbits=</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb1-2" title="2">x</a></code></pre></div>
+<pre><code>   ( 1 )    * |00&gt; </code></pre>
+<p>Per default this state is in the computational basis with all qubits in the <span class="math inline">\(|0\rangle\)</span> state. The basis state can also be supplied to <code>qstate</code> as an optional argument, e.g.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">CatInBox &lt;-<span class="st"> </span><span class="kw">qstate</span>(<span class="dt">nbits=</span><span class="dv">1</span>, <span class="dt">basis=</span><span class="kw">c</span>(<span class="st">&quot;|dead&gt;&quot;</span>, <span class="st">&quot;|alive&gt;&quot;</span>))</a>
+<a class="sourceLine" id="cb3-2" title="2">CatInBox</a></code></pre></div>
+<pre><code>   ( 1 )    * |dead&gt; </code></pre>
+<p>and also the coefficients of the separate basis states can be set</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">CatInBox &lt;-<span class="st"> </span><span class="kw">qstate</span>(<span class="dt">nbits=</span><span class="dv">1</span>, <span class="dt">basis=</span><span class="kw">c</span>(<span class="st">&quot;|dead&gt;&quot;</span>, <span class="st">&quot;|alive&gt;&quot;</span>),</a>
+<a class="sourceLine" id="cb5-2" title="2">                   <span class="dt">coefs=</span><span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span>), <span class="dv">1</span><span class="op">/</span><span class="kw">sqrt</span>(<span class="dv">2</span>))))</a>
+<a class="sourceLine" id="cb5-3" title="3">CatInBox</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |dead&gt; 
+ + ( 0.7071068 )    * |alive&gt; </code></pre>
+<p>A <code>qstate</code> object can also be plotted. If no gate was applied yet, this is not very interesting</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">plot</span>(x, <span class="dt">qubitnames=</span><span class="kw">c</span>(<span class="st">&quot;bit1&quot;</span>, <span class="st">&quot;bit2&quot;</span>))</a></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAABR1BMVEUAAAABAQECAgIDAwMEBAQICAgJCQkMDAwNDQ0ODg4PDw8QEBARERESEhITExMWFhYaGhohISEkJCQmJiYnJycrKys2NjY3Nzc4ODg8PDw+Pj5AQEBCQkJERERISEhQUFBRUVFTU1NXV1dYWFhaWlpcXFxdXV1gYGBhYWFnZ2dqampsbGxubm5xcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl9fX2BgYGDg4OIiIiKioqLi4uOjo6QkJCTk5OVlZWcnJygoKCkpKSlpaWsrKytra2wsLCxsbG0tLS1tbW2tra6urq7u7u/v7/ExMTIyMjLy8vMzMzNzc3Ozs7Pz8/Q0NDT09PV1dXc3Nze3t7j4+Po6Ojq6urt7e3u7u7v7+/w8PDx8fH09PT19fX39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///9yxStIAAAACXBIWXMAAA7DAAAOwwHHb6hkAAADsklEQVR4nO3a548UBRjA4UEpKjZUVOwVFcuJvYPt9OBU7CsoNlTA+f8/u1dCSLz4y32Y0Zjn+TCZTDZ5d37Z3ckm7zDyj4Z/+w381wkUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoChckCLYavt88OnBzHr85snq5/NNW4ycwQ6NH1cXz8wY2zy3c+P9W4ycwQaMNGoLMn7hkEumIxrD900+2vXh7HgyfHu4dh+OnUkSP7BLpiMdz81OrKnpXNQD88/MC5P5cXbxPoisXwyPJ4fN/5jUDbv0ECXWUxrC6P3wyfCrSzxfDZ8vjj8GEHOrs+py92dx8Tf4K+Hc50oPfvn9Ox3d3HhIEeWx5fPviLr9jOFsOep9devOb1zafY+OThzy+NAl1tMZy694bDb49bgT45dN3Po0D/RwIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAozLmC985dB+548+JUAycy4wrea8NzH7+095WpBk5kvhW8369/Znmysv/SVBOnMd8K3pfD6eXlD4bvppo4jflW8C4sfltefnb/hakmTmPeFbzxvb3Hpxo4kVlX8L4/OjzhKbZthxW8tVsOre700rdunNN9u7uPGVfw1q49tvPvzx/n5/Tr7u5jvhW8i7cenWrWlOZbwTs9vPDuBk+xLX9bwXtj2HJuqonT8Gc1CBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgKFvwCaEgN0kF7o5QAAAABJRU5ErkJggg==" style="display: block; margin: auto;" /></p>
+</div>
+<div id="applying-single-qubit-gates" class="section level2">
+<h2>Applying single qubit gates</h2>
+<p>Next one can apply single qubit quantum gates to such a <code>qstate</code>, like for instance the Hadamard gate</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">x &lt;-<span class="st"> </span><span class="kw">qstate</span>(<span class="dt">nbits=</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb8-2" title="2">y &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb8-3" title="3">y</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |00&gt; 
+ + ( 0.7071068 )    * |01&gt; </code></pre>
+<p>where the argument to <code>H</code> is the qubit to which to apply the gate. in <code>R</code> we start counting with 1, which corresponds to the least significant bit (or the rightmost one in <span class="math inline">\(|00\rangle\)</span>). <code>H(1)</code> returns an S4 object of class <code>sqgate</code> and the multiplication is overloaded.</p>
+<p>Now, with a gate included, plotting the state represents the quantum circuit used to generate the state, for instance</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">plot</span>(y)</a></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAclBMVEUAAAAHBwcRERETExMaGhocHBwgICAiIiIwMDA9PT1CQkJERERMTExQUFBUVFRdXV1qampubm5/f3+CgoKLi4ukpKSsrKy0tLS7u7vExMTHx8fNzc3Pz8/Q0NDd3d3l5eXq6uru7u7y8vL19fX9/f3///8OoRkoAAAACXBIWXMAAA7DAAAOwwHHb6hkAAACxklEQVR4nO3a20obUQCG0XiosVpbT1V7UNuq7/+KYpD0ooxfcjNu6Fo3AwkMPx+zIQNZPPGmxXsPGJ1AQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgcKYgb4uJ32aecqYgc7P7iZ83595yqCBzqe+uRfohUBBoLAO9PlwdbldXL9+INCKQEGgIFD4XwN9u9nQl3Wgxat1oL1N7zHlx3ab5wz0eHK8oeU60MHVi8u/gXY2vceU0+1GO2JBoCBQECgIFAYP9A+BVgQKAgWBwsVy6nfwxw8zTxkz0K/pV6mfM08ZM9BABAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgIFAQKAgUBAoCBYGCQEGgMOs/zJa7AzjabvSsT9Cf3wN42G6zIxYECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUBAoCBQECgIFgYJAQaAgUHgGSG2dn0acPoMAAAAASUVORK5CYII=" style="display: block; margin: auto;" /></p>
+<p>Even if there is a list of predefined single qubit gates (<code>H</code>, <code>X</code>, <code>Z</code>, <code>Y</code>, <code>Rz</code>, <code>Id</code>, <code>S</code>, <code>Tgate</code>), any single qubit gate can be defined as follows</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">myGate &lt;-<span class="st"> </span><span class="cf">function</span>(bit) {</a>
+<a class="sourceLine" id="cb11-2" title="2">  methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>, <span class="dt">bit=</span><span class="kw">as.integer</span>(bit),</a>
+<a class="sourceLine" id="cb11-3" title="3">               <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="op">-</span><span class="dv">1</span>)), <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)),</a>
+<a class="sourceLine" id="cb11-4" title="4">               <span class="dt">type=</span><span class="st">&quot;myGate&quot;</span>)</a>
+<a class="sourceLine" id="cb11-5" title="5">}</a></code></pre></div>
+<p>From now on this gate can be used like the predefined ones</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1">z &lt;-<span class="st"> </span><span class="kw">myGate</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb12-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |00&gt; 
+ + ( -0.7071068 )   * |01&gt; </code></pre>
+<p>The argument <code>M</code> must be a unitary <span class="math inline">\(2\times 2\)</span> complex valued matrix, which in this case is the third Pauli matrix predefined as <code>Z</code>.</p>
+<div id="truth-table" class="section level3">
+<h3>Truth Table</h3>
+<p>Sometimes it is useful to look at the quantum analogon of a truth table of a gate as it immediately shows how every qubit is influenced depending on the other qubits. It can provide a consistency check for a newly implemented gate, too. The truth table of a single qubit gate (here the <code>X</code> gate) can be obtained as follows</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">truth.table</span>(X, <span class="dv">1</span>)</a></code></pre></div>
+<pre><code>  In1 Out1
+1   0    1
+2   1    0</code></pre>
+</div>
+</div>
+<div id="multi-qubit-gates" class="section level2">
+<h2>Multi-qubit gates</h2>
+<p>The most important two-qubit gate is the controlled <code>NOT</code> or <code>CNOT</code> gate. It has the truth table</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="kw">truth.table</span>(CNOT, <span class="dv">2</span>)</a></code></pre></div>
+<pre><code>  In2 In1 Out2 Out1
+1   0   0    0    0
+2   0   1    1    1
+3   1   0    1    0
+4   1   1    0    1</code></pre>
+<p>and can for instance be used as follows to generate a Bell state</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">z &lt;-<span class="st"> </span><span class="kw">CNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb18-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |00&gt; 
+ + ( 0.7071068 )    * |11&gt; </code></pre>
+<p>Plotting the resulting circuit looks as follows</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1"><span class="kw">plot</span>(z)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>The arguments to <code>CNOT</code> are the controll and target bit in this order. Again, arbitrary controlled single qubit gates can be generated as follows</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">CX12 &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(1L, 2L), <span class="dt">gate=</span><span class="kw">X</span>(2L))</a>
+<a class="sourceLine" id="cb21-2" title="2">z &lt;-<span class="st"> </span>CX12 <span class="op">*</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb21-3" title="3">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |00&gt; 
+ + ( 0.7071068 )    * |11&gt; </code></pre>
+<p>which in this case is the <code>CNOT</code> gate again with control bit 1 and target bit 2. <code>cqgate</code> is a convenience function to generate a new S4 object of S4 class <code>cqgate</code>. Note that a similar function <code>sqgate</code> is available. The <code>gate</code> argument to <code>cqgate</code> can be any <code>sqgate</code> object.</p>
+<p>Another widely used two-qubit gate is the <code>SWAP</code> gate</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1">z &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb23-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |00&gt; 
+ + ( 0.7071068 )    * |10&gt; </code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" title="1"><span class="kw">plot</span>(z)</a></code></pre></div>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAA/FBMVEUAAAAEBAQMDAwNDQ0REREWFhYYGBgaGhobGxsdHR0gICAhISEiIiIjIyMmJiYnJycpKSktLS0uLi4vLy8wMDA4ODg6Ojo8PDw/Pz9AQEBCQkJERERJSUlNTU1PT09QUFBSUlJUVFRXV1dcXFxeXl5oaGhqamptbW1vb29zc3N7e3t9fX1/f3+KioqLi4uSkpKTk5OWlpadnZ2kpKSoqKisrKyxsbGysrK0tLS2tra3t7e7u7vBwcHFxcXJycnKysrNzc3Q0NDS0tLU1NTW1tbX19fY2Njd3d3g4ODk5OTl5eXn5+fr6+vu7u719fX4+Pj5+fn6+vr7+/v///9YuRv5AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAEH0lEQVR4nO3aaVcScRSAcUqzMlstK0vby7J939MWMyvT+P7fJVl1EHzAuOD1PM8bcGDwnt85M/MfDqWy7Vhp2APs9QSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIKGCfR4omM3hjhWsWEC3bn/vUNvTu+0399vrVvWl8KGHCrQo06vfN4R6Meh18UNazO3+jNRmzIClRfGXm79c2326nqfRtpeSqCiUKjP3gC6drb6sFhqHDoEtFUo1icr0KZQsE9aoIZQtE9eoJpQuE9ioIpQvM9ggBbfte1KE6hUrwl0rP0exZ6MTpx/280bCy30NvtAgOYute1oE2j8RaWHm0AH2+9RbHqkNNnN+4rd7m32xIfY2uyFM8UVY0R5gTbOP++nFsKF0gJVzs8fplrvOvpfVqDq9WsDKFwoKVDt+l4BihbaE0DbIqD6+qcKFCyUEqixPqwBxQplBFqfqa+f60Dlj63foPWxjEArd+v3Fw2g8qcHfRuqtWECzZ3stNo9N9nVBzSBAhsm0ErnG6YvXX3Afgf67wSCBIIEggSCBIIEggSCBIIEggSCBIIEggRq3/LFX7UnTaBn+/MXZrtu/tTP6mMD6Pnh7r4e2U0pgRpCdaBIn6RAdaEaUKhPVqCaUBUo1ictUFWoAhTskxeoIrQBFO2TGGhD6NVUuE9moPL8+PFwn8EAXR6N6UBppPedpnubfSBAq79Dejp288RSz3ut9jZ74kOscv5prKnjygtUOz+HC6UFaly/ooWyAm1e34OFkgJtXf/ECuUEKq4PQ4VSArWunyOFMgItH/nasuXe9bB/lhGo/KeLLf0qJdAgEwgSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCPoH6/Fo0/4Dq/QAAAAASUVORK5CYII=" style="display: block; margin: auto;" /></p>
+<p>The order of the bits supplied to <code>SWAP</code> is irrelevant, of course</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1">z &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>)) <span class="op">*</span><span class="st"> </span>y</a>
+<a class="sourceLine" id="cb26-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |00&gt; 
+ + ( 0.7071068 )    * |10&gt; </code></pre>
+<p>Finally, there are also the controlled <code>CNOT</code> or Toffoli gate and the controlled <code>SWAP</code> gate available</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1">x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span>(<span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span><span class="kw">qstate</span>(<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb28-2" title="2">x</a></code></pre></div>
+<pre><code>   ( 0.5 )  * |000&gt; 
+ + ( 0.5 )  * |001&gt; 
+ + ( 0.5 )  * |010&gt; 
+ + ( 0.5 )  * |011&gt; </code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">y &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb30-2" title="2">y</a></code></pre></div>
+<pre><code>   ( 0.5 )  * |000&gt; 
+ + ( 0.5 )  * |001&gt; 
+ + ( 0.5 )  * |010&gt; 
+ + ( 0.5 )  * |111&gt; </code></pre>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" title="1"><span class="kw">plot</span>(y)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>The arguments to <code>CCNOT</code> is a vector of three integers. The first two integers are the control bits, the last one the target bit.</p>
+<p>Similarly, the <code>CSWAP</code> or Fredkin gate</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">y &lt;-<span class="st"> </span><span class="kw">CSWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb33-2" title="2">y</a></code></pre></div>
+<pre><code>   ( 0.5 )  * |000&gt; 
+ + ( 0.5 )  * |001&gt; 
+ + ( 0.5 )  * |010&gt; 
+ + ( 0.5 )  * |101&gt; </code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1"><span class="kw">plot</span>(y)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="multi-gate-circuits-as-functions" class="section level2">
+<h2>Multi-gate circuits as functions</h2>
+<p>You might want to use specific circuits of several gates more than once and therefore find it tedious to type it completely every time you use it. Defining a new gate combining all of the operations might not be as easy either. In these cases we find it convenient to define generating functions of the form</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb36-1" title="1">myswap &lt;-<span class="st"> </span><span class="cf">function</span>(bits){</a>
+<a class="sourceLine" id="cb36-2" title="2">    <span class="cf">function</span>(x){</a>
+<a class="sourceLine" id="cb36-3" title="3">        <span class="kw">CNOT</span>(bits) <span class="op">*</span><span class="st"> </span>(<span class="kw">CNOT</span>(<span class="kw">rev</span>(bits)) <span class="op">*</span><span class="st"> </span>(<span class="kw">CNOT</span>(bits) <span class="op">*</span><span class="st"> </span>x))</a>
+<a class="sourceLine" id="cb36-4" title="4">    }</a>
+<a class="sourceLine" id="cb36-5" title="5">}</a></code></pre></div>
+<p>where an outer function takes any required information concerning the circuit. It then returns a function that applies given circuit to a state.</p>
+<p>Our example above implements a <code>SWAP</code> using only <code>CNOT</code> gates as can be checked with the truth table:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1"><span class="kw">truth.table</span>(myswap, <span class="dv">2</span>)</a></code></pre></div>
+<pre><code>  In2 In1 Out2 Out1
+1   0   0    0    0
+2   0   1    1    0
+3   1   0    0    1
+4   1   1    1    1</code></pre>
+<p>We can plot the circuit in the way we are used to as well.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">circuit &lt;-<span class="st"> </span><span class="kw">myswap</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb39-2" title="2"><span class="kw">plot</span>(<span class="kw">circuit</span>(<span class="kw">qstate</span>(<span class="dv">2</span>)))</a></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="measurements" class="section level2">
+<h2>Measurements</h2>
+<p>At any point single qubits can be measured</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">res &lt;-<span class="st"> </span><span class="kw">measure</span>(y, <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb40-2" title="2"><span class="kw">summary</span>(res)</a></code></pre></div>
+<pre><code>Bit 1 has been measured 1 times with the outcome:
+0:  0 
+1:  1 </code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1"><span class="kw">plot</span>(res<span class="op">$</span>psi)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>In this case the third qubit is <em>measured</em> and its value is stored in <code>res$value</code>. The wave function of the quantum state collapses, the result of which is stored again as a <code>qstate</code> object in <code>res$psi</code>.</p>
+<p>Such a measurement can be repeated, say 1000 times, for qubit 3</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" title="1">rv &lt;-<span class="st"> </span><span class="kw">measure</span>(y, <span class="dv">3</span>, <span class="dt">rep=</span><span class="dv">1000</span>)<span class="op">$</span>value</a>
+<a class="sourceLine" id="cb43-2" title="2"><span class="kw">hist</span>(rv, <span class="dt">freq=</span><span class="ot">FALSE</span>, <span class="dt">main=</span><span class="st">&quot;Probability for Qubit 3&quot;</span>)</a></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>where we read of from the wave function that the ratio should be <span class="math inline">\(3:1\)</span> for values <span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span>, which is well reproduced.</p>
+</div>
+</div>
+<div id="export-ot-qiskit" class="section level1">
+<h1>Export ot Qiskit</h1>
+<p>IBM provides quantum computing platforms, which can be freely used. However, one needs to programme in python using the <code>qiskit</code> package. For convenience, <code>qsimulatR</code> can export a circuit translated to <code>qiskit</code></p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1">filename &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="kw">tempdir</span>(), <span class="st">&quot;/circuit.py&quot;</span>)</a>
+<a class="sourceLine" id="cb44-2" title="2"><span class="kw">export2qiskit</span>(y, <span class="dt">filename=</span>filename)</a></code></pre></div>
+<p>which results in the following file</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" title="1"><span class="kw">cat</span>(<span class="kw">readLines</span>(filename), <span class="dt">sep =</span> <span class="st">&#39;</span><span class="ch">\n</span><span class="st">&#39;</span>)</a></code></pre></div>
+<pre><code># automatically generated by qsimulatR
+qc = QuantumCircuit(3)
+qc.h(1)
+qc.h(0)
+qc.cswap(0, 1, 2)</code></pre>
+<p>which can be used at <a href="https://quantum-computing.ibm.com">quantum-computing.ibm.com</a> to run on real quantum hardware. Note that the export functionality only works for standard quantum gates, not for customary defined ones.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

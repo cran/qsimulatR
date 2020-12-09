@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Carsten Urbach" />
+
+
+<title>Exponentiation modulo n</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Exponentiation modulo n</h1>
+<h4 class="author">Carsten Urbach</h4>
+
+
+
+<p>Note that for this we roughly follow the paper by Vedral, Barenco and Ekert <span class="citation">(1996)</span>. However, we use the addition by qft instead <span class="citation">(Draper 2000)</span> of the procedure using Toffoli gates.</p>
+<div id="multiplication-modulo-2n" class="section level2">
+<h2>Multiplication modulo <span class="math inline">\(2^n\)</span></h2>
+<p>For multiplying a state <span class="math inline">\(|j\rangle\)</span> with a constant <span class="math inline">\(a\)</span> we can follow the scheme to multiply two numbers in binary representation. As an example, multiply <span class="math inline">\(5\)</span> with <span class="math inline">\(3\)</span>. <span class="math inline">\(5\)</span> has binary representation <span class="math inline">\(0101\)</span> and <span class="math inline">\(3\)</span> has <span class="math inline">\(0011\)</span>. So, the procedure for <span class="math inline">\(5\cdot 3\)</span> is</p>
+<pre><code>  00011 * 1 (1*3)
++ 00110 * 0 (0*6)
++ 01100 * 1 (1*12)
++ 11000 * 0 (0*24)
+= 01111 (15)</code></pre>
+<p>Now, if we have a controlled add operation, we can use the qubits of the first register (in this case representing <span class="math inline">\(5\)</span>) as control bits and the other register as the constant to add. The single terms in the sum can be efficiently pre-computed classically as follows</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">summands &lt;-<span class="st"> </span><span class="cf">function</span>(x, n, N) {</a>
+<a class="sourceLine" id="cb2-2" title="2">  b &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">intToBits</span>(x))</a>
+<a class="sourceLine" id="cb2-3" title="3">  ret &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb2-4" title="4">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>N)) {</a>
+<a class="sourceLine" id="cb2-5" title="5">    s &lt;-<span class="st"> </span><span class="dv">0</span></a>
+<a class="sourceLine" id="cb2-6" title="6">    <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>N)) {</a>
+<a class="sourceLine" id="cb2-7" title="7">      s &lt;-<span class="st"> </span>s<span class="op">+</span><span class="kw">as.integer</span>(b[j])<span class="op">*</span><span class="dv">2</span><span class="op">^</span>(i<span class="op">+</span>j<span class="dv">-2</span>)</a>
+<a class="sourceLine" id="cb2-8" title="8">    }</a>
+<a class="sourceLine" id="cb2-9" title="9">    ret[i] &lt;-<span class="st"> </span>s <span class="op">%%</span><span class="st"> </span>n</a>
+<a class="sourceLine" id="cb2-10" title="10">  }</a>
+<a class="sourceLine" id="cb2-11" title="11">  <span class="kw">return</span>(ret)</a>
+<a class="sourceLine" id="cb2-12" title="12">}</a></code></pre></div>
+<p>Example</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1">x &lt;-<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">summands</span>(<span class="dv">3</span>, <span class="dv">2</span><span class="op">^</span><span class="dv">3</span>, <span class="dv">3</span>)</a></code></pre></div>
+<pre><code>[1] 3 6 4</code></pre>
+<p>Now we need a controlled add operation. Here we can build on our add operation using the qft for which we need a controlled phase shift operation first</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">cRtheta &lt;-<span class="st"> </span><span class="cf">function</span>(bits, <span class="dt">theta=</span><span class="fl">0.</span>) {</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="kw">cqgate</span>(<span class="dt">bits=</span>bits, <span class="dt">gate=</span>methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>, <span class="dt">bit=</span><span class="kw">as.integer</span>(bits[<span class="dv">2</span>]),</a>
+<a class="sourceLine" id="cb5-3" title="3">                                      <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="kw">exp</span>(1i<span class="op">*</span>theta))),</a>
+<a class="sourceLine" id="cb5-4" title="4">                                              <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)), <span class="dt">type=</span><span class="st">&quot;Rt&quot;</span>))</a>
+<a class="sourceLine" id="cb5-5" title="5">}</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">cadd &lt;-<span class="st"> </span><span class="cf">function</span>(c, bits, x, y) {</a>
+<a class="sourceLine" id="cb6-2" title="2">  n &lt;-<span class="st"> </span><span class="kw">length</span>(bits)</a>
+<a class="sourceLine" id="cb6-3" title="3">  z &lt;-<span class="st"> </span><span class="kw">cqft</span>(<span class="dt">c=</span>c, <span class="dt">x=</span>x, <span class="dt">bits=</span>bits)</a>
+<a class="sourceLine" id="cb6-4" title="4">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)) {</a>
+<a class="sourceLine" id="cb6-5" title="5">    z  &lt;-<span class="st"> </span><span class="kw">cRtheta</span>(<span class="dt">bits=</span><span class="kw">c</span>(c, bits[i]), <span class="dt">theta =</span> <span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>y<span class="op">/</span><span class="dv">2</span><span class="op">^</span>(n<span class="op">-</span>i<span class="op">+</span><span class="dv">1</span>)) <span class="op">*</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb6-6" title="6">  }</a>
+<a class="sourceLine" id="cb6-7" title="7">  z &lt;-<span class="st"> </span><span class="kw">cqft</span>(<span class="dt">c=</span>c, <span class="dt">x=</span>z, <span class="dt">inverse=</span><span class="ot">TRUE</span>, <span class="dt">bits=</span>bits)</a>
+<a class="sourceLine" id="cb6-8" title="8">  <span class="kw">return</span>(<span class="kw">invisible</span>(z))</a>
+<a class="sourceLine" id="cb6-9" title="9">}</a></code></pre></div>
+<p>Let’s check whether it works as expected (keep in mind that the register is 3 qubit wide plus 1 control qubit, so addition is modulo <span class="math inline">\(2^3=8\)</span>):</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">basis &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb7-2" title="2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">0</span><span class="op">:</span>(<span class="dv">2</span><span class="op">^</span><span class="dv">4-1</span>))) basis[i<span class="op">+</span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;|&quot;</span>, i <span class="op">%/%</span><span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;&gt;|&quot;</span>, i <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;&gt;&quot;</span>)</a>
+<a class="sourceLine" id="cb7-3" title="3">x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">4</span>, <span class="dt">basis=</span>basis)</a>
+<a class="sourceLine" id="cb7-4" title="4">c &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb7-5" title="5">bits &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb7-6" title="6">z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">x=</span>x, <span class="dt">y=</span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb7-7" title="7">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |0&gt;|0&gt; 
+ + ( 0.7071068 )    * |5&gt;|1&gt; </code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb9-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |0&gt;|0&gt; 
+ + ( 0.7071068 )    * |7&gt;|1&gt; </code></pre>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb11-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |0&gt;|0&gt; 
+ + ( 0.7071068 )    * |7&gt;|1&gt; </code></pre>
+<p>Equipped with this functionality, we can finally perform a binary multiplication. Note that we need two registers, the first one to store the initial value and the second one to store the final result of the multiplication</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">mult &lt;-<span class="st"> </span><span class="cf">function</span>(reg1, reg2, x, y, <span class="dt">swap=</span><span class="ot">TRUE</span>) {</a>
+<a class="sourceLine" id="cb13-2" title="2">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(reg1) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(reg2))</a>
+<a class="sourceLine" id="cb13-3" title="3">  n &lt;-<span class="st"> </span><span class="kw">length</span>(reg2)</a>
+<a class="sourceLine" id="cb13-4" title="4">  s &lt;-<span class="st"> </span><span class="kw">summands</span>(y, <span class="dv">2</span><span class="op">^</span>n, n)</a>
+<a class="sourceLine" id="cb13-5" title="5">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)) {</a>
+<a class="sourceLine" id="cb13-6" title="6">    x &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>reg1[i], <span class="dt">bits=</span>reg2, <span class="dt">x=</span>x, <span class="dt">y=</span>s[i])</a>
+<a class="sourceLine" id="cb13-7" title="7">  }</a>
+<a class="sourceLine" id="cb13-8" title="8">  <span class="cf">if</span>(swap) {</a>
+<a class="sourceLine" id="cb13-9" title="9">    <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)) {</a>
+<a class="sourceLine" id="cb13-10" title="10">      x &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(reg1[i], reg2[i])) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb13-11" title="11">    }</a>
+<a class="sourceLine" id="cb13-12" title="12">  }</a>
+<a class="sourceLine" id="cb13-13" title="13">  <span class="kw">return</span>(<span class="kw">invisible</span>(x))</a>
+<a class="sourceLine" id="cb13-14" title="14">}</a></code></pre></div>
+<p>With this we can perform a <em>reversible</em> multiplication, which is why we we introduced the SWAP operations at the end. They interchange the two registers. The result is the following</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1">basis &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">0</span><span class="op">:</span>(<span class="dv">2</span><span class="op">^</span><span class="dv">3-1</span>))) {</a>
+<a class="sourceLine" id="cb14-3" title="3">  <span class="cf">for</span>(j <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">0</span><span class="op">:</span>(<span class="dv">2</span><span class="op">^</span><span class="dv">3-1</span>))) {</a>
+<a class="sourceLine" id="cb14-4" title="4">    basis[i<span class="op">*</span><span class="dv">2</span><span class="op">^</span><span class="dv">3</span><span class="op">+</span>j <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;|&quot;</span>, i, <span class="st">&quot;&gt;|&quot;</span>, j, <span class="st">&quot;&gt;&quot;</span>)</a>
+<a class="sourceLine" id="cb14-5" title="5">  }</a>
+<a class="sourceLine" id="cb14-6" title="6">}</a>
+<a class="sourceLine" id="cb14-7" title="7">x &lt;-<span class="st"> </span><span class="kw">X</span>(<span class="dv">2</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">6</span>, <span class="dt">basis=</span>basis)</a>
+<a class="sourceLine" id="cb14-8" title="8">x</a></code></pre></div>
+<pre><code>   ( 1 )    * |0&gt;|2&gt; </code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">reg1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb16-2" title="2">reg2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">4</span><span class="op">:</span><span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb16-3" title="3">z &lt;-<span class="st"> </span><span class="kw">mult</span>(reg1, reg2, <span class="dt">x=</span>x, <span class="dt">y=</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb16-4" title="4">z &lt;-<span class="st"> </span><span class="kw">X</span>(<span class="dv">5</span>) <span class="op">*</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb16-5" title="5">z</a></code></pre></div>
+<pre><code>   ( 1 )    * |0&gt;|6&gt; </code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">z &lt;-<span class="st"> </span><span class="kw">mult</span>(reg1, reg2, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb18-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 1 )    * |6&gt;|2&gt; </code></pre>
+<p>Let’s be a bit more precise here for the multiplication of, say <span class="math inline">\(a\)</span> and <span class="math inline">\(b\)</span> in two registers, both <span class="math inline">\(n\)</span> qubits wide. Starting with both registers in state <span class="math inline">\(|0\rangle\)</span>, we can first bring the result register to state <span class="math inline">\(|1\rangle\)</span> using a NOT operation, i.e. <span class="math inline">\(|0\rangle|1\rangle\)</span>. Now, we multiply by <span class="math inline">\(a\)</span>, which leaves us with state <span class="math display">\[
+|a \mod 2^n \rangle|1\rangle
+\]</span> which we can apply the NOT gate again to reset the result register to state <span class="math inline">\(|0\rangle\)</span> and then we swap the two registers to arrive at <span class="math display">\[
+|0\rangle|a \mod 2^n\rangle\,.
+\]</span> Now we multiply by <span class="math inline">\(b\)</span> getting us to state <span class="math display">\[
+|a\times b \mod 2^n\rangle|a \mod 2^n\rangle\,.
+\]</span> Multiply the result register with the inverse of <span class="math inline">\(a \mod n\)</span> and apply the NOT gate getting us to <span class="math display">\[
+|0\rangle|a\times b \mod 2^n\rangle\,.
+\]</span> The inverse modulo <span class="math inline">\(2^n\)</span> can be computed efficiently in a classical way by the extended Euclidean algorithm</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" title="1">eEa &lt;-<span class="st"> </span><span class="cf">function</span>(a, b) {</a>
+<a class="sourceLine" id="cb20-2" title="2">  <span class="cf">if</span>(a <span class="op">==</span><span class="st"> </span><span class="dv">0</span>) <span class="kw">return</span>(<span class="kw">c</span>(b, <span class="dv">0</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb20-3" title="3">  res &lt;-<span class="st"> </span><span class="kw">eEa</span>(b <span class="op">%%</span><span class="st"> </span>a, a)</a>
+<a class="sourceLine" id="cb20-4" title="4">  <span class="kw">return</span>(<span class="kw">c</span>(res[<span class="dv">1</span>], res[<span class="dv">3</span>] <span class="op">-</span><span class="st"> </span>(b <span class="op">%/%</span><span class="st"> </span>a) <span class="op">*</span><span class="st"> </span>res[<span class="dv">2</span>], res[<span class="dv">2</span>]))</a>
+<a class="sourceLine" id="cb20-5" title="5">}</a>
+<a class="sourceLine" id="cb20-6" title="6"></a>
+<a class="sourceLine" id="cb20-7" title="7">moduloinverse &lt;-<span class="st"> </span><span class="cf">function</span>(a, n) {</a>
+<a class="sourceLine" id="cb20-8" title="8">  res &lt;-<span class="st"> </span><span class="kw">eEa</span>(<span class="dt">a=</span>a, <span class="dt">b=</span>n)</a>
+<a class="sourceLine" id="cb20-9" title="9">  <span class="cf">if</span>(res[<span class="dv">1</span>] <span class="op">!=</span><span class="st"> </span><span class="dv">1</span>) <span class="kw">stop</span>(<span class="st">&quot;inverse does not exist!&quot;</span>)</a>
+<a class="sourceLine" id="cb20-10" title="10">  <span class="kw">return</span>(res[<span class="dv">2</span>] <span class="op">%%</span><span class="st"> </span>n)</a>
+<a class="sourceLine" id="cb20-11" title="11">}</a></code></pre></div>
+<p>If <span class="math inline">\(a\)</span> and <span class="math inline">\(2^n\)</span> are not coprime, the inverse does not exist. However, for the application we have in mind this is not an issue.</p>
+</div>
+<div id="working-modulo-n" class="section level2">
+<h2>Working modulo <span class="math inline">\(N\)</span></h2>
+<p>So far we have assumed that we work modulo <span class="math inline">\(2^n\)</span>, where <span class="math inline">\(n\)</span> was dictated by the number of qubits. However, this is not the realistic case. We have to write an adder modulo <span class="math inline">\(N&lt;2^n\)</span>, i.e. <span class="math inline">\(|x\rangle\to|x + y\mod N\rangle\)</span>. We can implement this by subtracting <span class="math inline">\(N &lt; 2^n\)</span> whenever needed. We will follow the convention that if <span class="math inline">\(x\geq N\)</span> the operation will be <span class="math inline">\(|x\rangle\to|x\rangle\)</span>. Moreover, we will assume <span class="math inline">\(x,y\geq 0\)</span>.</p>
+<p>To find out, when this subtraction is needed, is a bit tricky. We want to add <span class="math inline">\(y\)</span> to <span class="math inline">\(x\)</span>. To decide beforehand, whether or not we have to subtract <span class="math inline">\(N\)</span>, we have to check whether <span class="math inline">\(x &lt; N-y\)</span>. If not, we have to subtract <span class="math inline">\(N\)</span>. If we subtract <span class="math inline">\(N-y\)</span> from this state <span class="math inline">\(|x\rangle\)</span>, the most significant qubit indicates whether there occurred an overflow. Using a CNOT gate we can store this info in one ancilla bit <span class="math inline">\(c_1\)</span>. Then we add <span class="math inline">\(N-y\)</span> again to retain the original state. Such an operation can be implemented as follows in a controlled manner (control bit <span class="math inline">\(c\)</span>, <code>bits</code> the bits in state <span class="math inline">\(|x\rangle\)</span> where x is stored, <span class="math inline">\(a\)</span> an ancilla bit and <span class="math inline">\(y\)</span> the value to compare with.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1">cis.less &lt;-<span class="st"> </span><span class="cf">function</span>(c, bits, x, c1, a, y) {</a>
+<a class="sourceLine" id="cb21-2" title="2">  <span class="co">## add ancilla bit as most significant bit to bits</span></a>
+<a class="sourceLine" id="cb21-3" title="3">  b &lt;-<span class="st"> </span><span class="kw">c</span>(bits, a)</a>
+<a class="sourceLine" id="cb21-4" title="4">  n &lt;-<span class="st"> </span><span class="kw">length</span>(b)</a>
+<a class="sourceLine" id="cb21-5" title="5">  <span class="co">## cadd works modulo 2^n</span></a>
+<a class="sourceLine" id="cb21-6" title="6">  z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>b, <span class="dt">x=</span>x, <span class="dt">y=</span><span class="dv">2</span><span class="op">^</span>n<span class="op">-</span>y)</a>
+<a class="sourceLine" id="cb21-7" title="7">  <span class="co">## &#39;copy&#39; overflow bit</span></a>
+<a class="sourceLine" id="cb21-8" title="8">  z &lt;-<span class="st"> </span><span class="kw">CNOT</span>(<span class="kw">c</span>(a, c1)) <span class="op">*</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb21-9" title="9">  <span class="co">## add back, resetting ancilla a to |0&gt;</span></a>
+<a class="sourceLine" id="cb21-10" title="10">  z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>b, <span class="dt">x=</span>z, <span class="dt">y=</span>y)</a>
+<a class="sourceLine" id="cb21-11" title="11">  <span class="kw">return</span>(z)</a>
+<a class="sourceLine" id="cb21-12" title="12">}</a></code></pre></div>
+<p>This routine will set the qubit <span class="math inline">\(|c_1\rangle\)</span> to 1 if <span class="math inline">\(|x_\mathrm{bits}\rangle\)</span> is smaller than <span class="math inline">\(y\)</span> and leave it at zero otherwise. It uses <span class="math inline">\(|a\rangle\)</span> as ancilla bit and <span class="math inline">\(|c\rangle\)</span> as control bit. Here an example</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" title="1">basis &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb22-2" title="2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">0</span><span class="op">:</span>(<span class="dv">2</span><span class="op">^</span><span class="dv">6-1</span>))) {</a>
+<a class="sourceLine" id="cb22-3" title="3">  basis[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-</a>
+<a class="sourceLine" id="cb22-4" title="4"><span class="st">    </span><span class="kw">paste0</span>(<span class="st">&quot;|&quot;</span>, i <span class="op">%/%</span><span class="st"> </span><span class="dv">8</span> ,<span class="st">&quot;&gt;|a=&quot;</span>,</a>
+<a class="sourceLine" id="cb22-5" title="5">    (i <span class="op">%/%</span><span class="st"> </span><span class="dv">4</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;&gt;|c1=&quot;</span>, (i<span class="op">%/%</span><span class="dv">2</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb22-6" title="6">    <span class="st">&quot;&gt;|c=&quot;</span>, i<span class="op">%%</span><span class="dv">2</span>, <span class="st">&quot;&gt;&quot;</span>)</a>
+<a class="sourceLine" id="cb22-7" title="7">}</a>
+<a class="sourceLine" id="cb22-8" title="8"></a>
+<a class="sourceLine" id="cb22-9" title="9">x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">6</span>, <span class="dt">basis=</span>basis)</a>
+<a class="sourceLine" id="cb22-10" title="10">z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span><span class="dv">1</span>, <span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>), <span class="dt">x=</span>x, <span class="dt">y=</span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb22-11" title="11">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |0&gt;|a=0&gt;|c1=0&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |5&gt;|a=0&gt;|c1=0&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" title="1"><span class="co">## 5 &lt; 7 -&gt; c1 = 1</span></a>
+<a class="sourceLine" id="cb24-2" title="2">v &lt;-<span class="st"> </span><span class="kw">cis.less</span>(<span class="dt">c=</span><span class="dv">1</span>, <span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>), <span class="dt">x=</span>z, <span class="dt">c1=</span><span class="dv">2</span>, <span class="dt">a=</span><span class="dv">3</span>, <span class="dt">y=</span><span class="dv">7</span>)</a>
+<a class="sourceLine" id="cb24-3" title="3">v</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |0&gt;|a=0&gt;|c1=0&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |5&gt;|a=0&gt;|c1=1&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb26-1" title="1"><span class="co">## 5 &gt; 3 -&gt; c1 = 0</span></a>
+<a class="sourceLine" id="cb26-2" title="2">w &lt;-<span class="st"> </span><span class="kw">cis.less</span>(<span class="dt">c=</span><span class="dv">1</span>, <span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>), <span class="dt">x=</span>z, <span class="dt">c1=</span><span class="dv">2</span>, <span class="dt">a=</span><span class="dv">3</span>, <span class="dt">y=</span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb26-3" title="3">w</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |0&gt;|a=0&gt;|c1=0&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |5&gt;|a=0&gt;|c1=0&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb28-1" title="1"><span class="co">## 5 &lt; 9 -&gt; c1 = 1</span></a>
+<a class="sourceLine" id="cb28-2" title="2">w &lt;-<span class="st"> </span><span class="kw">cis.less</span>(<span class="dt">c=</span><span class="dv">1</span>, <span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">6</span>), <span class="dt">x=</span>z, <span class="dt">c1=</span><span class="dv">2</span>, <span class="dt">a=</span><span class="dv">3</span>, <span class="dt">y=</span><span class="dv">9</span>)</a>
+<a class="sourceLine" id="cb28-3" title="3">w</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |0&gt;|a=0&gt;|c1=0&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |5&gt;|a=0&gt;|c1=1&gt;|c=1&gt; </code></pre>
+<p>Now, recall that if <span class="math inline">\(x\geq N\)</span> we want the operation to leave the state unchanged. So, we need two <code>cis.less</code> operations, one to check whether <span class="math inline">\(x &lt; N\)</span>, which we store in ancilla qubit <span class="math inline">\(c_1\)</span> and another one to check whether <span class="math inline">\(x &lt; N-y\)</span> stored in <span class="math inline">\(c_2\)</span>. Note that the combination <span class="math inline">\(c_1=0, c_2=1\)</span> is not possible. The implementation looks as follows:</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" title="1">caddmodN &lt;-<span class="st"> </span><span class="cf">function</span>(c, bits, c1, c2, a, x, y, N) {</a>
+<a class="sourceLine" id="cb30-2" title="2">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(a) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;&amp;</span><span class="st"> </span><span class="kw">length</span>(c1) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;&amp;</span></a>
+<a class="sourceLine" id="cb30-3" title="3"><span class="st">            </span><span class="kw">length</span>(c2) <span class="op">==</span><span class="st"> </span><span class="dv">1</span> <span class="op">&amp;&amp;</span></a>
+<a class="sourceLine" id="cb30-4" title="4"><span class="st">            </span><span class="kw">length</span>(<span class="kw">unique</span>(<span class="kw">c</span>(c1, c2, a))) <span class="op">==</span><span class="st"> </span><span class="dv">3</span>)</a>
+<a class="sourceLine" id="cb30-5" title="5">  y &lt;-<span class="st"> </span>y <span class="op">%%</span><span class="st"> </span>N</a>
+<a class="sourceLine" id="cb30-6" title="6">  <span class="co">## set c1=1 if x &lt; N</span></a>
+<a class="sourceLine" id="cb30-7" title="7">  z &lt;-<span class="st"> </span><span class="kw">cis.less</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">x=</span>x, <span class="dt">c1=</span>c1, <span class="dt">a=</span>a, <span class="dt">y=</span>N)</a>
+<a class="sourceLine" id="cb30-8" title="8">  <span class="co">## set c2=1 if x &lt; N - y</span></a>
+<a class="sourceLine" id="cb30-9" title="9">  z &lt;-<span class="st"> </span><span class="kw">cis.less</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">x=</span>z, <span class="dt">c1=</span>c2, <span class="dt">a=</span>a, <span class="dt">y=</span>N<span class="op">-</span>y)</a>
+<a class="sourceLine" id="cb30-10" title="10">  </a>
+<a class="sourceLine" id="cb30-11" title="11">  <span class="co">## if c1 and not c2, x = x + y - N</span></a>
+<a class="sourceLine" id="cb30-12" title="12">  z &lt;-<span class="st"> </span><span class="kw">X</span>(c2) <span class="op">*</span>( <span class="kw">CCNOT</span>(<span class="kw">c</span>(c1, c2, a)) <span class="op">*</span><span class="st"> </span>(<span class="kw">X</span>(c2) <span class="op">*</span><span class="st"> </span>z))</a>
+<a class="sourceLine" id="cb30-13" title="13">  z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>a, <span class="dt">bits=</span>bits, <span class="dt">x=</span>z, <span class="dt">y=</span>y <span class="op">-</span><span class="st"> </span>N)</a>
+<a class="sourceLine" id="cb30-14" title="14">  z &lt;-<span class="st"> </span><span class="kw">X</span>(c2) <span class="op">*</span><span class="st"> </span>(<span class="kw">CCNOT</span>(<span class="kw">c</span>(c1, c2, a)) <span class="op">*</span><span class="st"> </span>(<span class="kw">X</span>(c2) <span class="op">*</span><span class="st"> </span>z))</a>
+<a class="sourceLine" id="cb30-15" title="15">  </a>
+<a class="sourceLine" id="cb30-16" title="16">  <span class="co">## if c1 and c2 add x = x + y</span></a>
+<a class="sourceLine" id="cb30-17" title="17">  z &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(c1, c2, a)) <span class="op">*</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb30-18" title="18">  z &lt;-<span class="st"> </span><span class="kw">cadd</span>(<span class="dt">c=</span>a, <span class="dt">bits=</span>bits, <span class="dt">x=</span>z, <span class="dt">y=</span>y)</a>
+<a class="sourceLine" id="cb30-19" title="19">  z &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(c1, c2, a)) <span class="op">*</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb30-20" title="20">  </a>
+<a class="sourceLine" id="cb30-21" title="21">  <span class="co">## reset c1,2</span></a>
+<a class="sourceLine" id="cb30-22" title="22">  z &lt;-<span class="st"> </span><span class="kw">cis.less</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">x=</span>z, <span class="dt">c1=</span>c2, <span class="dt">a=</span>a, <span class="dt">y=</span>y)</a>
+<a class="sourceLine" id="cb30-23" title="23">  z &lt;-<span class="st"> </span><span class="kw">CNOT</span>(<span class="kw">c</span>(c1, c2)) <span class="op">*</span><span class="st"> </span>z</a>
+<a class="sourceLine" id="cb30-24" title="24">  z &lt;-<span class="st"> </span><span class="kw">cis.less</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">x=</span>z, <span class="dt">c1=</span>c1, <span class="dt">a=</span>a, <span class="dt">y=</span>N)</a>
+<a class="sourceLine" id="cb30-25" title="25">  <span class="kw">return</span>(<span class="kw">invisible</span>(z))</a>
+<a class="sourceLine" id="cb30-26" title="26">}</a></code></pre></div>
+<p>For the reset part: in the first step we flip <span class="math inline">\(c_2\)</span> if <span class="math inline">\(x + y \mod N &lt; y\)</span>. This can only be true if <span class="math inline">\(x&gt;N-y\)</span>. If <span class="math inline">\(c_2\)</span> was 1, it’s zero now and the other way around. The next CNOT gate flips <span class="math inline">\(c_2\)</span> to <span class="math inline">\(|0\rangle\)</span>. The last step resets <span class="math inline">\(c_1\)</span> to <span class="math inline">\(|0\rangle\)</span>.</p>
+<p>You can also see from the routine above that, if <span class="math inline">\(x\geq N\)</span> then <code>caddmodN</code> leaves the state unchanged.</p>
+<p>Example</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" title="1">basis &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb31-2" title="2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">0</span><span class="op">:</span>(<span class="dv">2</span><span class="op">^</span><span class="dv">7-1</span>))) {</a>
+<a class="sourceLine" id="cb31-3" title="3">  basis[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-</a>
+<a class="sourceLine" id="cb31-4" title="4"><span class="st">    </span><span class="kw">paste0</span>(<span class="st">&quot;|&quot;</span>, i <span class="op">%/%</span><span class="st"> </span><span class="dv">16</span> , <span class="st">&quot;&gt;|a=&quot;</span>, (i <span class="op">%/%</span><span class="st"> </span><span class="dv">8</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb31-5" title="5">           <span class="st">&quot;&gt;|c2=&quot;</span>, (i <span class="op">%/%</span><span class="st"> </span><span class="dv">4</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb31-6" title="6">           <span class="st">&quot;&gt;|c1=&quot;</span>, (i<span class="op">%/%</span><span class="dv">2</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;&gt;|c=&quot;</span>, i<span class="op">%%</span><span class="dv">2</span>, <span class="st">&quot;&gt;&quot;</span>)</a>
+<a class="sourceLine" id="cb31-7" title="7">}</a>
+<a class="sourceLine" id="cb31-8" title="8"></a>
+<a class="sourceLine" id="cb31-9" title="9">x &lt;-<span class="st"> </span><span class="kw">X</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">7</span>, <span class="dt">basis=</span>basis)</a>
+<a class="sourceLine" id="cb31-10" title="10">x</a></code></pre></div>
+<pre><code>   ( 1 )    * |0&gt;|a=0&gt;|c2=0&gt;|c1=0&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" title="1">bits &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">6</span>,<span class="dv">7</span>)</a>
+<a class="sourceLine" id="cb33-2" title="2">c &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb33-3" title="3">c1 &lt;-<span class="st"> </span><span class="dv">2</span></a>
+<a class="sourceLine" id="cb33-4" title="4">c2 &lt;-<span class="st"> </span><span class="dv">3</span></a>
+<a class="sourceLine" id="cb33-5" title="5">a &lt;-<span class="st"> </span><span class="dv">4</span></a>
+<a class="sourceLine" id="cb33-6" title="6">N &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb33-7" title="7">z &lt;-<span class="st"> </span><span class="kw">caddmodN</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">c1=</span>c1, <span class="dt">c2=</span>c2, <span class="dt">a=</span>a, <span class="dt">x=</span>x, <span class="dt">y=</span><span class="dv">3</span>, <span class="dt">N=</span>N) <span class="co"># 0 + 3 mod 5</span></a>
+<a class="sourceLine" id="cb33-8" title="8">z</a></code></pre></div>
+<pre><code>   ( 1 )    * |3&gt;|a=0&gt;|c2=0&gt;|c1=0&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" title="1">z &lt;-<span class="st"> </span><span class="kw">caddmodN</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">c1=</span>c1, <span class="dt">c2=</span>c2, <span class="dt">a=</span>a, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">1</span>, <span class="dt">N=</span>N) <span class="co"># 3 + 1 mod 5</span></a>
+<a class="sourceLine" id="cb35-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 1 )    * |4&gt;|a=0&gt;|c2=0&gt;|c1=0&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" title="1">z &lt;-<span class="st"> </span><span class="kw">caddmodN</span>(<span class="dt">c=</span>c, <span class="dt">bits=</span>bits, <span class="dt">c1=</span>c1, <span class="dt">c2=</span>c2, <span class="dt">a=</span>a, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">6</span>, <span class="dt">N=</span>N) <span class="co"># 4 + 6 mod 5</span></a>
+<a class="sourceLine" id="cb37-2" title="2">z</a></code></pre></div>
+<pre><code>   ( 1 )    * |0&gt;|a=0&gt;|c2=0&gt;|c1=0&gt;|c=1&gt; </code></pre>
+</div>
+<div id="controlled-multiplier-modulo-n" class="section level1">
+<h1>Controlled Multiplier modulo <span class="math inline">\(N\)</span></h1>
+<p>Now, like the <code>mult</code> function above a version performing <span class="math inline">\(|x\rangle\to|x+y\mod N\rangle\)</span>. Here we also include the un-computation of the second register. <code>reg1</code> is the result register.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" title="1">cmultmodN &lt;-<span class="st"> </span><span class="cf">function</span>(c, reg1, reg2, ancillas, x, y, N) {</a>
+<a class="sourceLine" id="cb39-2" title="2">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(reg1) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(reg2))</a>
+<a class="sourceLine" id="cb39-3" title="3">  <span class="co">## need 4 ancilla registers</span></a>
+<a class="sourceLine" id="cb39-4" title="4">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(ancillas) <span class="op">==</span><span class="st"> </span><span class="dv">4</span> <span class="op">&amp;&amp;</span></a>
+<a class="sourceLine" id="cb39-5" title="5"><span class="st">            </span><span class="kw">length</span>(<span class="kw">unique</span>(ancillas)) <span class="op">==</span><span class="st"> </span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb39-6" title="6">  n &lt;-<span class="st"> </span><span class="kw">length</span>(reg2)</a>
+<a class="sourceLine" id="cb39-7" title="7">  <span class="co">## precompute terms in the sum</span></a>
+<a class="sourceLine" id="cb39-8" title="8">  s &lt;-<span class="st"> </span><span class="kw">summands</span>(y, N, n)</a>
+<a class="sourceLine" id="cb39-9" title="9">  <span class="co">## start with |x&gt;|0&gt;</span></a>
+<a class="sourceLine" id="cb39-10" title="10">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)) {</a>
+<a class="sourceLine" id="cb39-11" title="11">    x &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(c, reg1[i], ancillas[<span class="dv">4</span>])) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb39-12" title="12">    x &lt;-<span class="st"> </span><span class="kw">caddmodN</span>(<span class="dt">c=</span>ancillas[<span class="dv">4</span>], <span class="dt">bits=</span>reg2,</a>
+<a class="sourceLine" id="cb39-13" title="13">                  <span class="dt">c1=</span>ancillas[<span class="dv">1</span>], <span class="dt">c2=</span>ancillas[<span class="dv">2</span>],</a>
+<a class="sourceLine" id="cb39-14" title="14">                  <span class="dt">a=</span>ancillas[<span class="dv">3</span>],</a>
+<a class="sourceLine" id="cb39-15" title="15">                  <span class="dt">x=</span>x, <span class="dt">y=</span>s[i], <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb39-16" title="16">    x &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(c, reg1[i], ancillas[<span class="dv">4</span>])) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb39-17" title="17">  }</a>
+<a class="sourceLine" id="cb39-18" title="18">  <span class="co">## now |x&gt;|xy mod N&gt;</span></a>
+<a class="sourceLine" id="cb39-19" title="19">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)) {</a>
+<a class="sourceLine" id="cb39-20" title="20">    x &lt;-<span class="st"> </span><span class="kw">CSWAP</span>(<span class="kw">c</span>(c, reg1[i], reg2[i])) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb39-21" title="21">  }</a>
+<a class="sourceLine" id="cb39-22" title="22">  <span class="co">## now |xy mod N&gt;|x&gt;</span></a>
+<a class="sourceLine" id="cb39-23" title="23">  <span class="co">## -y_inv mod N</span></a>
+<a class="sourceLine" id="cb39-24" title="24">  yinv &lt;-<span class="st"> </span>N <span class="op">-</span><span class="st"> </span><span class="kw">moduloinverse</span>(<span class="dt">a=</span>y, <span class="dt">n=</span>N)</a>
+<a class="sourceLine" id="cb39-25" title="25">  s &lt;-<span class="st"> </span><span class="kw">summands</span>(yinv, N, n)</a>
+<a class="sourceLine" id="cb39-26" title="26">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)) {</a>
+<a class="sourceLine" id="cb39-27" title="27">    x &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(c, reg1[i], ancillas[<span class="dv">4</span>])) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb39-28" title="28">    x &lt;-<span class="st"> </span><span class="kw">caddmodN</span>(<span class="dt">c=</span>ancillas[<span class="dv">4</span>], <span class="dt">bits=</span>reg2,</a>
+<a class="sourceLine" id="cb39-29" title="29">                  <span class="dt">c1=</span>ancillas[<span class="dv">1</span>], <span class="dt">c2=</span>ancillas[<span class="dv">2</span>],</a>
+<a class="sourceLine" id="cb39-30" title="30">                  <span class="dt">a=</span>ancillas[<span class="dv">3</span>],</a>
+<a class="sourceLine" id="cb39-31" title="31">                  <span class="dt">x=</span>x, <span class="dt">y=</span>s[i], <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb39-32" title="32">    x &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(c, reg1[i], ancillas[<span class="dv">4</span>])) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb39-33" title="33">  }</a>
+<a class="sourceLine" id="cb39-34" title="34">  <span class="co">## finally |xy mod N&gt;|0&gt;</span></a>
+<a class="sourceLine" id="cb39-35" title="35">  <span class="kw">return</span>(<span class="kw">invisible</span>(x))</a>
+<a class="sourceLine" id="cb39-36" title="36">}</a></code></pre></div>
+<p>For the un-computation of the second register, we start in the state (only the two registers <code>reg1</code> and <code>reg2</code>) <span class="math display">\[
+|x\cdot y \mod N\rangle|x\rangle\,.
+\]</span> Now we determine <span class="math inline">\(yy_\mathrm{inv} = 1\mod N\)</span> the modular inverse of <span class="math inline">\(y\)</span> (which is only possible, if <span class="math inline">\(y\)</span> and <span class="math inline">\(N\)</span> are co-prime). If we set <span class="math inline">\(y&#39; = xy\mod N\)</span> it follows <span class="math inline">\(y_\mathrm{inv}y&#39; = y_\mathrm{inv}yx\mod N=x\mod N\)</span>. Thus, <span class="math inline">\(x=y_\mathrm{inv}y&#39;\mod N\)</span>. So, if we perform the following trafo <span class="math display">\[
+|y&#39;\rangle|x\rangle\to|y&#39;\rangle|x-y_\mathrm{inv}y&#39;\mod N\rangle = |y&#39;\rangle|0\rangle\,.
+\]</span> we obtain <span class="math inline">\(|x\cdot y \mod N\rangle|0\rangle\)</span>.</p>
+<p>Example with two 3 qubit registers, which is starting to become slow, because in total we need 11 qubits</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb40-1" title="1">basis &lt;-<span class="st"> </span><span class="kw">c</span>()</a>
+<a class="sourceLine" id="cb40-2" title="2"><span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">0</span><span class="op">:</span>(<span class="dv">2</span><span class="op">^</span><span class="dv">11-1</span>))) {</a>
+<a class="sourceLine" id="cb40-3" title="3">  basis[i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>] &lt;-</a>
+<a class="sourceLine" id="cb40-4" title="4"><span class="st">    </span><span class="kw">paste0</span>(<span class="st">&quot;|reg1=&quot;</span>, i <span class="op">%/%</span><span class="st"> </span>(<span class="dv">32</span><span class="op">*</span><span class="dv">2</span><span class="op">^</span><span class="dv">3</span>) , <span class="st">&quot;&gt;|reg2=&quot;</span>, (i <span class="op">%/%</span><span class="st"> </span><span class="dv">32</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span><span class="op">^</span><span class="dv">3</span> ,</a>
+<a class="sourceLine" id="cb40-5" title="5">           <span class="st">&quot;|anc=&quot;</span>, (i <span class="op">%/%</span><span class="st"> </span><span class="dv">16</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb40-6" title="6">           (i <span class="op">%/%</span><span class="st"> </span><span class="dv">8</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>, (i <span class="op">%/%</span><span class="st"> </span><span class="dv">4</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>,</a>
+<a class="sourceLine" id="cb40-7" title="7">           (i<span class="op">%/%</span><span class="dv">2</span>) <span class="op">%%</span><span class="st"> </span><span class="dv">2</span>, <span class="st">&quot;&gt;|c=&quot;</span>, i<span class="op">%%</span><span class="dv">2</span>, <span class="st">&quot;&gt;&quot;</span>)</a>
+<a class="sourceLine" id="cb40-8" title="8">}</a>
+<a class="sourceLine" id="cb40-9" title="9">x &lt;-<span class="st"> </span><span class="kw">CNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">10</span>)) <span class="op">*</span><span class="st"> </span>(<span class="kw">H</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">11</span>, <span class="dt">basis=</span>basis))</a>
+<a class="sourceLine" id="cb40-10" title="10">x</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=2&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb42-1" title="1">c &lt;-<span class="st"> </span><span class="dv">1</span></a>
+<a class="sourceLine" id="cb42-2" title="2">ancillas &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span><span class="op">:</span><span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb42-3" title="3">reg2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">6</span><span class="op">:</span><span class="dv">8</span>)</a>
+<a class="sourceLine" id="cb42-4" title="4">reg1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">9</span><span class="op">:</span><span class="dv">11</span>)</a>
+<a class="sourceLine" id="cb42-5" title="5">N &lt;-<span class="st"> </span><span class="dv">5</span></a>
+<a class="sourceLine" id="cb42-6" title="6">z &lt;-<span class="st"> </span><span class="kw">cmultmodN</span>(<span class="dt">c=</span>c, <span class="dt">reg1=</span>reg1, <span class="dt">reg2=</span>reg2,</a>
+<a class="sourceLine" id="cb42-7" title="7">               <span class="dt">ancillas=</span>ancillas, <span class="dt">x=</span>x, <span class="dt">y=</span><span class="dv">3</span>, <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb42-8" title="8">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=1&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb44-1" title="1">z &lt;-<span class="st"> </span><span class="kw">cmultmodN</span>(<span class="dt">c=</span>c, <span class="dt">reg1=</span>reg1, <span class="dt">reg2=</span>reg2,</a>
+<a class="sourceLine" id="cb44-2" title="2">               <span class="dt">ancillas=</span>ancillas, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">3</span>, <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb44-3" title="3">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=3&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" title="1">z &lt;-<span class="st"> </span><span class="kw">cmultmodN</span>(<span class="dt">c=</span>c, <span class="dt">reg1=</span>reg1, <span class="dt">reg2=</span>reg2,</a>
+<a class="sourceLine" id="cb46-2" title="2">               <span class="dt">ancillas=</span>ancillas, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">3</span>, <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb46-3" title="3">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=4&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" title="1">z &lt;-<span class="st"> </span><span class="kw">cmultmodN</span>(<span class="dt">c=</span>c, <span class="dt">reg1=</span>reg1, <span class="dt">reg2=</span>reg2,</a>
+<a class="sourceLine" id="cb48-2" title="2">               <span class="dt">ancillas=</span>ancillas, <span class="dt">x=</span>z, <span class="dt">y=</span><span class="dv">3</span>, <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb48-3" title="3">z</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=2&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<p>This seems to work up to this point.</p>
+<div id="exponentiation-modulo-n" class="section level2">
+<h2>Exponentiation modulo <span class="math inline">\(N\)</span></h2>
+<p>For the order finding algorithm, we have to implement the operation <span class="math inline">\(f_{a,N}(x) = a^x y \mod N\)</span>, where we set <span class="math inline">\(y=1\)</span> in the following. All this is stored in a <span class="math inline">\(n\)</span> qubit register with <span class="math inline">\(2^n &gt; N\)</span>.</p>
+<p>So, the following function implements the unitary operation naively <span class="math display">\[
+|x\rangle\ \to\ |xy^a \mod N\rangle
+\]</span></p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" title="1">cexpomodN &lt;-<span class="st"> </span><span class="cf">function</span>(c, reg1, reg2, ancillas, x, y, a, N) {</a>
+<a class="sourceLine" id="cb50-2" title="2">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(reg1) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(reg2))</a>
+<a class="sourceLine" id="cb50-3" title="3">  <span class="co">## need 4 ancilla registers</span></a>
+<a class="sourceLine" id="cb50-4" title="4">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(ancillas) <span class="op">==</span><span class="st"> </span><span class="dv">4</span> <span class="op">&amp;&amp;</span></a>
+<a class="sourceLine" id="cb50-5" title="5"><span class="st">            </span><span class="kw">length</span>(<span class="kw">unique</span>(ancillas)) <span class="op">==</span><span class="st"> </span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb50-6" title="6">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>a)) {</a>
+<a class="sourceLine" id="cb50-7" title="7">    x &lt;-<span class="st"> </span><span class="kw">cmultmodN</span>(<span class="dt">c=</span>c, <span class="dt">reg1=</span>reg1, <span class="dt">reg2=</span>reg2,</a>
+<a class="sourceLine" id="cb50-8" title="8">                   <span class="dt">ancillas=</span>ancillas, <span class="dt">x=</span>x, <span class="dt">y=</span>y, <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb50-9" title="9">  }</a>
+<a class="sourceLine" id="cb50-10" title="10">  <span class="kw">return</span>(<span class="kw">invisible</span>(x))</a>
+<a class="sourceLine" id="cb50-11" title="11">}</a></code></pre></div>
+<p>Example, performing the same example operation as above, i.e. starting with <span class="math inline">\(x=2\)</span> and multiplying it with <span class="math inline">\(y^a\mod N\)</span>, with <span class="math inline">\(a=4\)</span>, <span class="math inline">\(y=3\)</span> and <span class="math inline">\(N=5\)</span>.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" title="1">x &lt;-<span class="st"> </span><span class="kw">CNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">10</span>)) <span class="op">*</span><span class="st"> </span>(<span class="kw">H</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">11</span>, <span class="dt">basis=</span>basis))</a>
+<a class="sourceLine" id="cb51-2" title="2">x</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=2&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" title="1">x &lt;-<span class="st"> </span><span class="kw">cexpomodN</span>(c, reg1, reg2, ancillas, x, <span class="dt">y=</span><span class="dv">3</span>, <span class="dt">a=</span><span class="dv">4</span>, N)</a>
+<a class="sourceLine" id="cb53-2" title="2">x</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=2&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<p>The result should equal 2.</p>
+<p>Using the binary representation of <span class="math inline">\(x\)</span>, we can write <span class="math display">\[
+y^a\ =\ y^{2^0 a_0} \cdot y^{2^1 a_1} \cdot \ldots y^{2^{m-1}a_{m-1}}
+\]</span> if <span class="math inline">\(x\)</span> is stored with <span class="math inline">\(m\)</span> bits. So, alternatively, if we start with the result register in state <span class="math inline">\(|1\rangle\)</span> we have to multiply successivly <span class="math inline">\(m\)</span>-times by <span class="math inline">\(a^{2^i} \mod n\)</span> depending on the value of the qubit <span class="math inline">\(|x_i\rangle\)</span>. This task can be also achieved with the controlled multiplier developed above. However, we need one more register to store <span class="math inline">\(a\)</span>. Let’s cheat here a bit and use a classical <code>if</code>-statement. For large <span class="math inline">\(a\)</span> this implementation is of course much faster, but the factors <span class="math inline">\(y^{2^i}\)</span> become very large very quickly. That’s why we apply the modulo</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" title="1">cexpomodN2 &lt;-<span class="st"> </span><span class="cf">function</span>(c, reg1, reg2, ancillas, x, y, a, N) {</a>
+<a class="sourceLine" id="cb55-2" title="2">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(reg1) <span class="op">==</span><span class="st"> </span><span class="kw">length</span>(reg2))</a>
+<a class="sourceLine" id="cb55-3" title="3">  <span class="co">## need 4 ancilla registers</span></a>
+<a class="sourceLine" id="cb55-4" title="4">  <span class="kw">stopifnot</span>(<span class="kw">length</span>(ancillas) <span class="op">==</span><span class="st"> </span><span class="dv">4</span> <span class="op">&amp;&amp;</span></a>
+<a class="sourceLine" id="cb55-5" title="5"><span class="st">            </span><span class="kw">length</span>(<span class="kw">unique</span>(ancillas)) <span class="op">==</span><span class="st"> </span><span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb55-6" title="6">  ab &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">intToBits</span>(a))</a>
+<a class="sourceLine" id="cb55-7" title="7">  n &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="kw">which</span>(ab <span class="op">==</span><span class="st"> </span><span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb55-8" title="8">  y2 &lt;-<span class="st"> </span>y <span class="op">%%</span><span class="st"> </span>N</a>
+<a class="sourceLine" id="cb55-9" title="9">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span>n)) {</a>
+<a class="sourceLine" id="cb55-10" title="10">    <span class="cf">if</span>(ab[i] <span class="op">==</span><span class="st"> </span><span class="dv">1</span>) {</a>
+<a class="sourceLine" id="cb55-11" title="11">      x &lt;-<span class="st"> </span><span class="kw">cmultmodN</span>(<span class="dt">c=</span>c, <span class="dt">reg1=</span>reg1, <span class="dt">reg2=</span>reg2,</a>
+<a class="sourceLine" id="cb55-12" title="12">                     <span class="dt">ancillas=</span>ancillas, <span class="dt">x=</span>x, <span class="dt">y=</span>y2, <span class="dt">N=</span>N)</a>
+<a class="sourceLine" id="cb55-13" title="13">    }</a>
+<a class="sourceLine" id="cb55-14" title="14">    y2 &lt;-<span class="st"> </span>((y2<span class="op">%%</span>N) <span class="op">*</span><span class="st"> </span>(y2<span class="op">%%</span>N)) <span class="op">%%</span><span class="st"> </span>N <span class="co"># y2=y^(2^i) mod N</span></a>
+<a class="sourceLine" id="cb55-15" title="15">  }</a>
+<a class="sourceLine" id="cb55-16" title="16">  <span class="kw">return</span>(<span class="kw">invisible</span>(x))</a>
+<a class="sourceLine" id="cb55-17" title="17">}</a></code></pre></div>
+<p>Example</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" title="1">x &lt;-<span class="st"> </span><span class="kw">CNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">10</span>)) <span class="op">*</span><span class="st"> </span>(<span class="kw">H</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">11</span>, <span class="dt">basis=</span>basis))</a>
+<a class="sourceLine" id="cb56-2" title="2">x</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=2&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" title="1">x &lt;-<span class="st"> </span><span class="kw">cexpomodN2</span>(c, reg1, reg2, ancillas, x, <span class="dt">y=</span><span class="dv">3</span>, <span class="dt">a=</span><span class="dv">4</span>, N)</a>
+<a class="sourceLine" id="cb58-2" title="2">x</a></code></pre></div>
+<pre><code>   ( 0.7071068 )    * |reg1=0&gt;|reg2=0|anc=0000&gt;|c=0&gt; 
+ + ( 0.7071068 )    * |reg1=2&gt;|reg2=0|anc=0000&gt;|c=1&gt; </code></pre>
+</div>
+</div>
+<div id="bibliography" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-draper2000addition">
+<p>Draper, Thomas G. 2000. “Addition on a Quantum Computer.” <em>arXiv Preprint Quant-Ph/0008033</em>.</p>
+</div>
+<div id="ref-Vedral_1996">
+<p>Vedral, Vlatko, Adriano Barenco, and Artur Ekert. 1996. “Quantum Networks for Elementary Arithmetic Operations.” <em>Physical Review A</em> 54 (1): 147–53. <a href="https://doi.org/10.1103/physreva.54.147">https://doi.org/10.1103/physreva.54.147</a>.</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
