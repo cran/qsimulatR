@@ -23,6 +23,12 @@ significant bit.
 as the \code{collapse}-parameter in \code{genComputationalBasis}. A vector
 of length 2^nbits yields the basis directly.}
 
+\item{\code{noise}}{List containing the probability \code{p} some noise is applied
+to one of the \code{bits} after a gate application, the model
+\code{error} of this noise and further arguments \code{args} to be passed to the
+function \code{noise}. See function \code{noise} for details.
+The list \code{noise} can be generated with \code{genNoise}.}
+
 \item{\code{circuit}}{List containing the number of non-quantum bits \code{ncbits}
 and a list of gates \code{gatelist} applied to the original state.
 Filled automatically as gates are applied, required for plotting.}
@@ -37,5 +43,11 @@ x
 
 x <- qstate(nbits=1, coefs=as.complex(sqrt(rep(0.5, 2))), basis=c("|dead>", "|alive>"))
 x
+
+x <- qstate(nbits=2, noise=genNoise(nbits=2, p=1))
+Id(2) * x
+
+x <- qstate(nbits=3, noise=genNoise(p=1, bits=1:2, error="small", sigma=0.1))
+Id(2) * x
 
 }

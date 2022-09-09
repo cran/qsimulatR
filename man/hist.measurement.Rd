@@ -4,7 +4,8 @@
 \alias{hist.measurement}
 \title{Plot the histogram of a quantum measurement}
 \usage{
-\method{hist}{measurement}(x, only.nonzero = TRUE, by.name = only.nonzero, freq = TRUE, ...)
+\method{hist}{measurement}(x, only.nonzero = TRUE, by.name = only.nonzero,
+  freq = TRUE, ...)
 }
 \arguments{
 \item{x}{object as returned by \code{measure}}

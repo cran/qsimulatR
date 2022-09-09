@@ -1,10 +1,10 @@
 ## ----echo=FALSE---------------------------------------------------------------
 library(knitr)
-library(qsimulatR)
 knitr::opts_chunk$set(fig.align='center',
                       comment='')
 
 ## -----------------------------------------------------------------------------
+library(qsimulatR)
 x <- qstate(nbits=2)
 x
 
@@ -18,7 +18,7 @@ CatInBox <- qstate(nbits=1, basis=c("|dead>", "|alive>"),
 CatInBox
 
 ## ---- fig.align="center"------------------------------------------------------
-plot(x, qubitnames=c("bit1", "bit2"))
+plot(x, qubitnames=c("qubit1", "qubit2"))
 
 ## -----------------------------------------------------------------------------
 x <- qstate(nbits=2)
@@ -102,8 +102,49 @@ rv <- measure(y, 3, rep=1000)$value
 hist(rv, freq=FALSE, main="Probability for Qubit 3")
 
 ## -----------------------------------------------------------------------------
+y <- qstate(3)
+y <- qft(y, inverse=FALSE)
+plot(y)
+
+## -----------------------------------------------------------------------------
+y <- qstate(4)
+y <- qft(y, bits=c(2:4), inverse=FALSE)
+plot(y)
+
+## -----------------------------------------------------------------------------
+cnotwrapper <- function(c, j, x, k) {
+  if(j == 1) return(CNOT(c(c, k)) * x)
+  return(Id(k) * x)
+}
+
+## -----------------------------------------------------------------------------
+x <- H(1) * qstate(3)
+x <- phase_estimation(bitmask=c(2:3), FUN=cnotwrapper, x=x, k=1)
+x
+
+## -----------------------------------------------------------------------------
+x <- H(1) * (X(1) * qstate(3))
+x <- phase_estimation(bitmask=c(2:3), FUN=cnotwrapper, x=x, k=1)
+x
+
+## -----------------------------------------------------------------------------
+x <- noise(bit=1, error="X") * qstate(nbits=2)
+x
+y <- noise(bit=2, p=0.5) * x
+y
+z <- noise(bit=2, error="small", args=list(sigma=0.1)) * x
+z
+
+## -----------------------------------------------------------------------------
+x <- qstate(nbits=2, noise=genNoise(nbits=2, p=1, error="any"))
+
+## -----------------------------------------------------------------------------
+y <- Id(2) * x
+y
+
+## -----------------------------------------------------------------------------
 filename <- paste0(tempdir(), "/circuit.py")
-export2qiskit(y, filename=filename)
+export2qiskit(y, filename=filename, import=TRUE)
 
 ## ----comment=''---------------------------------------------------------------
 cat(readLines(filename), sep = '\n')

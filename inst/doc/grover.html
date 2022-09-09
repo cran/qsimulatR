@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Carsten Urbach" />
+
+
+<title>Grover’s Algorithm</title>
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Grover’s Algorithm</h1>
+<h4 class="author">Carsten Urbach</h4>
+
+
+
+<div id="the-algorithm" class="section level1">
+<h1>The Algorithm</h1>
+<p>Grover’s quantum search algorithm is defined via the two following unitary operations <span class="math display">\[
+U\ =\ 1-2|x_s\rangle\langle x_s|\,,\quad V\ =\ 1-2|\psi\rangle\langle\psi|\,.
+\]</span> Here <span class="math display">\[
+|\psi\rangle\ =\ \frac{1}{\sqrt{N}}\sum_x |x\rangle\,,
+\]</span> with states <span class="math inline">\(|x\rangle\)</span> in the computational basis and <span class="math inline">\(N=2^n\)</span> with <span class="math inline">\(n\)</span> the number of qubits. <span class="math inline">\(x_s\)</span> is the index of the element sougth for.</p>
+<p>The unitary operator <span class="math inline">\(U\)</span> is implemented via an oracle function <span class="math inline">\(f\)</span> performing the following action <span class="math display">\[
+|x\rangle|q\rangle\ \to\ |x\rangle|q\oplus f(x)\rangle
+\]</span> with <span class="math display">\[
+f(x)\ =\ 
+\begin{cases}
+1 &amp; x=x_s\,,\\
+0 &amp; \mathrm{ortherwise}\,.\\
+\end{cases}
+\]</span> Thus, the qubit <span class="math inline">\(q\)</span> is flipped, if <span class="math inline">\(f(x)=1\)</span>.</p>
+<p>The quantum circuit for <span class="math inline">\(U\)</span> looks as follows</p>
+<p><img src="data:image/png;base64,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q7+Kt/Re9FP2njmg7QP65z51mPslnXRaXH0DhReiR+Kbb4eevje9pRXRNyHsPLozfB4tTS1aHoi39NPB81LnTDs7FAC1N3yUG5e7zCedFlfnQGFidO798yc19dkY0lva2NDxwRunHnrBltDR8vSKS5q+T193pjbOWnZbj4dDHmhedOHr6eJPMuZfKCacFlfvQGF5+8BeJ92xPXRtKbwy+NBT3lzQPD3s6hzY+6xPu165/DX7uJ7HxhekHNDk7FuN+MJe8FYj2bS4ugdK1v/wzWqyBIL+L0Atr5ZZR0eJgy1Pljsu1dh6BPr9qo4yO6utra3fBf84ODR1cEi5EzveKW8P/qdeSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCBIIEggSCDob/aUwb8AcYPLAAAAAElFTkSuQmCC" style="display: block; margin: auto;" /></p>
+<p>For <span class="math inline">\(V\)</span> it looks like</p>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="example-case-n4" class="section level1">
+<h1>Example case <span class="math inline">\(N=4\)</span></h1>
+<p>The case <span class="math inline">\(n=2\)</span> and <span class="math inline">\(N=2^2=4\)</span> can be implemented as follows: assume <span class="math inline">\(x_s=2\)</span>, thus we need a function <span class="math inline">\(f(x) = 1\)</span> for <span class="math inline">\(x=2\)</span> and <span class="math inline">\(f(x) = 0\)</span> otherwise. This is achieved as follows:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="co">## oracle for n=2 and x_s=2</span></a>
+<a class="sourceLine" id="cb1-2" title="2">oracle &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb1-3" title="3">  x &lt;-<span class="st"> </span><span class="kw">X</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>(<span class="kw">CCNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)) <span class="op">*</span>(<span class="kw">X</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>x))</a>
+<a class="sourceLine" id="cb1-4" title="4">  <span class="kw">return</span>(x)</a>
+<a class="sourceLine" id="cb1-5" title="5">}</a></code></pre></div>
+<p>The following test should return <code>1</code> only for <span class="math inline">\(x=x_s\)</span></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="co">## case |00&gt;=0</span></a>
+<a class="sourceLine" id="cb2-2" title="2">x &lt;-<span class="st"> </span><span class="kw">oracle</span>(<span class="kw">qstate</span>(<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="kw">measure</span>(x, <span class="dv">3</span>)<span class="op">$</span>value</a></code></pre></div>
+<pre><code>[1] 0</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="co">## case |01&gt;=1</span></a>
+<a class="sourceLine" id="cb4-2" title="2">x &lt;-<span class="st"> </span><span class="kw">oracle</span>(<span class="kw">X</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="kw">measure</span>(x, <span class="dv">3</span>)<span class="op">$</span>value</a></code></pre></div>
+<pre><code>[1] 0</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="co">## case |10&gt;=2</span></a>
+<a class="sourceLine" id="cb6-2" title="2">x &lt;-<span class="st"> </span><span class="kw">oracle</span>(<span class="kw">X</span>(<span class="dv">2</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb6-3" title="3"><span class="kw">measure</span>(x, <span class="dv">3</span>)<span class="op">$</span>value</a></code></pre></div>
+<pre><code>[1] 1</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co">## case |11&gt;=3</span></a>
+<a class="sourceLine" id="cb8-2" title="2">x &lt;-<span class="st"> </span><span class="kw">oracle</span>(<span class="kw">X</span>(<span class="dv">2</span>)<span class="op">*</span>(<span class="kw">X</span>(<span class="dv">1</span>)<span class="op">*</span><span class="kw">qstate</span>(<span class="dv">3</span>)))</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="kw">measure</span>(x, <span class="dv">3</span>)<span class="op">$</span>value</a></code></pre></div>
+<pre><code>[1] 0</code></pre>
+<p>The unitaries <span class="math inline">\(U\)</span> and <span class="math inline">\(V\)</span> for the <span class="math inline">\(n=2\)</span> can then be implemented as follows</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">U &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb10-2" title="2">  x &lt;-<span class="st"> </span><span class="kw">oracle</span>(x)</a>
+<a class="sourceLine" id="cb10-3" title="3">  x &lt;-<span class="st"> </span><span class="kw">Z</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb10-4" title="4">  x &lt;-<span class="st"> </span><span class="kw">oracle</span>(x)</a>
+<a class="sourceLine" id="cb10-5" title="5">  <span class="kw">return</span>(x)</a>
+<a class="sourceLine" id="cb10-6" title="6">}</a>
+<a class="sourceLine" id="cb10-7" title="7">V &lt;-<span class="st"> </span><span class="cf">function</span>(x) {</a>
+<a class="sourceLine" id="cb10-8" title="8">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)) {</a>
+<a class="sourceLine" id="cb10-9" title="9">    x &lt;-<span class="st"> </span><span class="kw">H</span>(i) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb10-10" title="10">  }</a>
+<a class="sourceLine" id="cb10-11" title="11">  x &lt;-<span class="st"> </span><span class="kw">X</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>(<span class="kw">X</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>x)</a>
+<a class="sourceLine" id="cb10-12" title="12">  x &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb10-13" title="13">  x &lt;-<span class="st"> </span><span class="kw">Z</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb10-14" title="14">  x &lt;-<span class="st"> </span><span class="kw">CCNOT</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb10-15" title="15">  x &lt;-<span class="st"> </span><span class="kw">X</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>(<span class="kw">X</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>x)</a>
+<a class="sourceLine" id="cb10-16" title="16">  <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>)) {</a>
+<a class="sourceLine" id="cb10-17" title="17">    x &lt;-<span class="st"> </span><span class="kw">H</span>(i) <span class="op">*</span><span class="st"> </span>x</a>
+<a class="sourceLine" id="cb10-18" title="18">  }</a>
+<a class="sourceLine" id="cb10-19" title="19">  <span class="kw">return</span>(x)</a>
+<a class="sourceLine" id="cb10-20" title="20">}</a></code></pre></div>
+<p>One application of <span class="math inline">\(V\cdot U\)</span> looks as follows in the quantum circuit picture</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAACylBMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkKCgoLCwsMDAwNDQ0ODg4PDw8QEBARERESEhIUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkqKiorKyssLCwtLS0uLi4vLy8wMDAxMTEyMjIzMzM0NDQ2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw9PT0+Pj4/Pz9AQEBBQUFCQkJDQ0NERERFRUVGRkZHR0dJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlaWlpbW1tcXFxdXV1eXl5fX19gYGBhYWFiYmJjY2NkZGRmZmZoaGhpaWlqampra2tsbGxtbW1ubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1/f3+AgICBgYGCgoKEhISFhYWGhoaHh4eIiIiJiYmKioqLi4uMjIyNjY2Ojo6Pj4+QkJCRkZGSkpKTk5OWlpaXl5eYmJiZmZmbm5ucnJydnZ2enp6fn5+goKChoaGioqKjo6OkpKSlpaWnp6eqqqqrq6usrKytra2urq6vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi6urq7u7u8vLy9vb2+vr6/v7/BwcHCwsLDw8PExMTFxcXGxsbHx8fIyMjJycnKysrMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PV1dXW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHi4uLj4+Pk5OTl5eXm5ubo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///9vhs3/AAAACXBIWXMAAA7DAAAOwwHHb6hkAAAL9UlEQVR4nO3c+39T5QHH8cOghSK2hZbOgjUt12mBzgiCFCkitooUEcdFYKKd4lSuBVRgFlHwMlvvzslWcSBjIjoFx0QDOMSpWwEHqNxEufZCnv9hPffnJM/Jl5Y2Nr6+nx/MafLkyclb0/ScJ1ETLGbaj70DbT0CgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCIQCACgQgEIhCoNYCeXaGqrLi45EFzc06xpzLz2kduKi6eam7OlW4N9uvX/3r3xynujDujHrn+986NC7yPceNS936vNeXJtALQieRyVb0nOJtDR6gGzMx0Nodf416dOVM5XXn56N9GPfSeNOfWosE+dyt/ILUpz6Y1gLoorx673tlcXKEasGuAs7lkiXv1gF0+j/OMAijX2Vw5z2//vieQHoF+ckAlLQrU8Ok75bOirk0woL1dbtAvTgXya8Xhuzqsd661geQB4s0+A5z79bKBbi1wgOTBdb/L1DSt44LT3kd+Oz/XmaLfPHcKvU+0DdYVbQdIVGn6O+qcDtvFVwFNW+9ce3NF1ACxXNMGuPdTAEmDz4zSzILH5Qd+RtNy3SkSAShclHFYhNo3PtsRmgsULupcETXgA00CCgdUQO7gcs3uDulxd2gSULhXIgCJPRdNqy8oqBMfaRKQ2JNUETlAjJOBxP0qIGfw6XQHSPvWfdzbZSCxKCGARKVWmvwvIR7zAIkxFZEDRJoHaIkSyB682fXRXncfq6cHaGViAIWHaUsbL+Z6gaR3MWvAWc0HqPHqXZGD10hAGXlO7XyA7KFtEujYJVpp48UyL9CcisgBopMPUGBNzq7IwZskoFU1Tt18gAJr9Fa2TaCpaZXaaiHe8gLlV0QOEIXn8xKzBh+RgD53H6skAV9i67QXRGm3r0VtLxlonVYROUC85gGapARyBt/m+IyUHnedB+jXiQB0NOvasDiYOlaILRLQ0ayciqgB4VskoKMXqYDcwQcvs3wu+UJ+4OkS0NGLEwFocqcvhf432x+F2HaFAzS5028qogfULnSBJndQAUmD9xcbPoVfeh64fml6rjtFAgC9oS3XL8LXpB/U/7neudZ+F/MMEJsHOPe7TgHkHby7qmPppKiH3pHrTFGcAEDeWvpo/uKVP7GjeQLZEQh0olO1qmC5szl+smrAqhxnc+JE9+qcVcrpqlOmKYC6OzdPG6u+W3X1qz82UMP0iaquzErqOcbcHN7T05XmteMu7dytv7lZKN2ampLSOdv9sZ89X4fxa6Ie+sSUvKB180jvY1xa4u5JNGyM4rgu9mk+GjHlT02Y7uIfVNeWPd+EKc4nAoEIBGpDQC9NzBli/5rIU/6W0gvZw1VAJ6Y6v4OKIn4H3ehOcX9T9roNAU2Y677TaH5vQaOd/0JUQInxLuYXBJLelXx3qyw2UEL8HeQXgUAEiln4nwuzXvkq1oibbKDG4297tzxLi3o20L+f6/jEJ1FT7EyIhUNlH+UbZ3BmHPcbULdQUwDJS4tGJtCBEmO2Ed7zQQ3L3PNBbXnhUNUH9jnSq06qB4QnaEogd7XQzAA6GLDPKHqEZiTIwqGiut7OWeTF6hGrNTWQu7RoZgD9ypmtSJrizURZOFS00V2GyGpQjij0A3KWFs10IHlVQzopnTCrGmYHaqQekJ7S+zWqOspAjdvuRNZqoVVZRU3Nq9JsT+B1sTa3cGh0pE+eVJr0lHrkKcrVZKDAGmm37KVFs7KMvLwsabbzWFltcwuHilZIT+l/yhFpvi8xe2nRTH+JyWvz1e7AhFmbV7TNfUa91SPG+QE5q4VmOpD86Y5v3Cm8n+5owwuHqgqdZ/ScesAWHyB3tdDMeBeb78w2Q5piu5YgC4eq9tlrobef8xnxiBpIWi00MoBOj7Rm+6Xn786nJaC2vHCo7NBM/Qn1rAr7jlibqgDyrhYK+y/p2mUZjbOlzz/lnWLj5QmxcOjTqdWB3f48ookHq/U7O2+ujbo1kQ9WeTQPIxCIQCAIVOp+I0fz+6rOoNhACfFtH78Q0PsrCibZX+ka7/22153ul7322cNVQHVPDr7FGjfPO0PxEneKV5qy120IiOtiBIodgWK3NydZdaIjL6/3XntIU4AG/yygmiw1Y13L7nb8gP6arzxTVlOTb60mn/5kyPwvYv6tLXU46XPFVJ+9dXXfh/yO9ppXnIC+X9Y3M+hzW9AA+kdp6sCUHr2y7zuIZ6t/8er0dtEHGh9PTMvv0rl71t0xV5eaWHyANmTdsT0UC+jklMCLx0RglvhveUYlmu2zK0ZtqkuOBDozs2fVEfGLfpV7H854/MJ32S4uQM/3/FCIWEDfXTnzbONWQP+S5Z6B4NMXW7P+0PjPSKCTwybpx/aNQELsv+qu832pwuIBtCl7j5CADkScRQ+GGm4wTQwg8cPAmP8N7ct+W7+wgZzZxhgmBpA4NfjRltr5OACdDbynXzhAp42T6K/3Stpt/hwMvTzcXAsygcSejAMxphtvnCFygKzZstqZC9EmkDiY+Z8W2vs4AFWNMy4iXmKV2lPWVvDjy7aZWxaQWBz9fWanHTlnjEvvS6xSu9vcsIDE8hmiZYoD0Mi/GRdeoFDyOHsz+PIga8sG2uezuqi36CHz0gMUSrrI2rKBvu0a/S7XrFofqD7F/FfuATqed9kxezs4a4G1ZQOJ/p/6Tjd0i3kpAx3P63antWkDias+bP4uy7UWUMNa+xNvVV1mG02RgSYkbXO2gwWjzBGzUwdZG7lz/T4/V512lzmkfa08W+lU6+Ye2UXm7X3v8Zlga9OeSGsBfTfJ/sjk6A7mxyi7S0CV2pPuD8H0rtYnLZPTrI2UAuVn0fXaWx8ql/5QbJytxL5D967p5u2dr/CZYE7Tnkjrv8ROWb8epJdYKHmsNCB45yPWlnMsNmSb8GuQ9UEG9yWmz/boQuuHsiLrJXbd35u/y3Jx+CXd13wDdoGO5+UclW4PPlZibdlAJ9KUR+pG0581Lx0gY7aNI6yfbKDarocucLet4gA0b5Fx4QJNSPL8Ag1uSTtsbtlAq4v9Z3vD+pqqA2TMdrbrfvMnG2hd4QXutV0cgPZlGAvoDtBL2o3rjKzD0mDoPuvgwgKq6/Ou/2x1fc0bbSBrtltHm7NZQA0DW+qsRzwONR66vl5IQM6HhaxVjGDoUI+NxpYFdO/4WLNtCBjeNpAzm7mKYQEtHNNSOx8PoIaS207HPljdmmkcXxlA5x68/PuY0y0t0F9OkQerOzLX6hcGULii15EL3Wm7uBzNn5k+YFNMILG1x+wjJtDOUdceBtOtyn6hIQpIhHLu+cYE2l189dfKOzanOJ0w+0v//tNinjA7dG/azY8PK3t4cHZVPZwtdN3Py9pHHUocnZte8lhR/+JhWU+30GGGXrxOuYZDs2KfURTH/zx/6Pil72EevZpnooGE+KG6vDBQ/E5d9C3NL37npHemjlaXGv0/jDyPUkapZ7u0qmV3O35A5za/o25zs86y7/CZ7d0TLbvbcVwXS8wIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiEAgAoEIBCIQiECg/wPY+NEJLZpI2gAAAABJRU5ErkJggg==" style="display: block; margin: auto;" /></p>
+<p><span class="math inline">\(N=4\)</span> is the special case where the algorithms returns the correct result with certainty after only a single application of <span class="math inline">\(V\cdot U\)</span>. This is demonstrated in the following example</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="co">## prepare psi</span></a>
+<a class="sourceLine" id="cb11-2" title="2">psi &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>( <span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span><span class="kw">qstate</span>(<span class="dv">3</span>))</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co">## apply VU</span></a>
+<a class="sourceLine" id="cb11-4" title="4">x &lt;-<span class="st"> </span><span class="kw">U</span>(psi)</a>
+<a class="sourceLine" id="cb11-5" title="5">x &lt;-<span class="st"> </span><span class="kw">V</span>(x)</a>
+<a class="sourceLine" id="cb11-6" title="6">x</a></code></pre></div>
+<pre><code>   ( -1 )   * |010&gt; </code></pre>
+<p>As expected, the first two qubits (the two rightmost ones) of <code>x</code> are equal to <span class="math inline">\(x_s\)</span> in binary representation. (The phase is not observable.)</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
