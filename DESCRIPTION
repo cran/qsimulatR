@@ -1,6 +1,6 @@
 Package: qsimulatR
-Version: 1.1
-Date: 2022-09-09
+Version: 1.1.1
+Date: 2023-10-16
 Title: A Quantum Computer Simulator
 Authors@R: 
     c(person(given = "Johann",
@@ -22,7 +22,7 @@ Description: A quantum computer simulator framework with up to 24 qubits. It all
 Imports: methods, stats
 Suggests: knitr, markdown, rmarkdown
 License: GPL-3
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 VignetteBuilder: knitr
 URL: https://github.com/HISKP-LQCD/qsimulatR
@@ -31,9 +31,9 @@ Collate: 'state.R' 'sqgate.R' 'ccqgate.R' 'cnotgate.R' 'cnqgate.R'
         'cqgate.R' 'export2qiskit.R' 'measure.R' 'phase_estimation.R'
         'plot-qstate.R' 'qft.R' 'qsimulatR-package.R' 'swapgate.R'
 NeedsCompilation: no
-Packaged: 2022-09-09 15:34:45 UTC; urbach
+Packaged: 2023-10-16 09:48:50 UTC; urbach
 Author: Johann Ostmeyer [aut],
   Carsten Urbach [aut, cre]
 Maintainer: Carsten Urbach <urbach@hiskp.uni-bonn.de>
 Repository: CRAN
-Date/Publication: 2022-09-09 16:10:02 UTC
+Date/Publication: 2023-10-16 10:10:02 UTC

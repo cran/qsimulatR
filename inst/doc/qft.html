@@ -15,6 +15,35 @@
 
 <title>Quantum Fourier Trafo</title>
 
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -26,6 +55,7 @@
     </style>
 
 
+
 <style type="text/css">
   code {
     white-space: pre;
@@ -35,26 +65,27 @@
   }
 </style>
 <style type="text/css" data-origin="pandoc">
-a.sourceLine { display: inline-block; line-height: 1.25; }
-a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
-a.sourceLine:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-code.sourceCode { white-space: pre-wrap; }
-a.sourceLine { text-indent: -1em; padding-left: 1em; }
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
-pre.numberSource a.sourceLine
-  { position: relative; left: -4em; }
-pre.numberSource a.sourceLine::before
-  { content: attr(title);
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
     position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; pointer-events: all; display: inline-block;
+    border: none; display: inline-block;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
@@ -63,9 +94,9 @@ pre.numberSource a.sourceLine::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {  }
+  {   }
 @media screen {
-a.sourceLine::before { text-decoration: underline; }
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -105,13 +136,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -323,79 +361,79 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="three-qubit-qft" class="section level1">
 <h1>Three qubit QFT</h1>
 <p>Let’s take a normalised vector with eight components and Fourier transform it</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1">N &lt;-<span class="st"> </span><span class="dv">3</span></a>
-<a class="sourceLine" id="cb1-2" title="2">v &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span><span class="op">^</span>N)</a>
-<a class="sourceLine" id="cb1-3" title="3">v &lt;-<span class="st"> </span>v<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">sum</span>(v<span class="op">^</span><span class="dv">2</span>))</a>
-<a class="sourceLine" id="cb1-4" title="4"></a>
-<a class="sourceLine" id="cb1-5" title="5">w &lt;-<span class="st"> </span><span class="kw">fft</span>(v, <span class="dt">inverse=</span><span class="ot">TRUE</span>)<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">length</span>(v))</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a>N &lt;-<span class="st"> </span><span class="dv">3</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>v &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">2</span><span class="op">^</span>N)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>v &lt;-<span class="st"> </span>v<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">sum</span>(v<span class="op">^</span><span class="dv">2</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>w &lt;-<span class="st"> </span><span class="kw">fft</span>(v, <span class="dt">inverse=</span><span class="ot">TRUE</span>)<span class="op">/</span><span class="kw">sqrt</span>(<span class="kw">length</span>(v))</span></code></pre></div>
 <p>We have to use the  Fast Fourier Trafo (FFT) here because <code>R</code> uses the convention where the phase is <span class="math inline">\(\exp\left(-2\pi i jk/n\right)\)</span> and the quantum Fourier Trafo uses the convention <span class="math inline">\(\exp\left(2\pi i jk/n\right)\)</span>.</p>
 <p>The same using the quantum Fourier Trafo (QFT). Note that we have to start with the most significant bit, which in this case is qubit 3.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">x &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span><span class="kw">as.complex</span>(v))</a>
-<a class="sourceLine" id="cb2-2" title="2">x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>x</a>
-<a class="sourceLine" id="cb2-3" title="3">x &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">S</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</a>
-<a class="sourceLine" id="cb2-4" title="4">x &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Tgate</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</a>
-<a class="sourceLine" id="cb2-5" title="5">x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>x</a>
-<a class="sourceLine" id="cb2-6" title="6">x &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">gate=</span><span class="kw">S</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>x</a>
-<a class="sourceLine" id="cb2-7" title="7">x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>x</a>
-<a class="sourceLine" id="cb2-8" title="8">x &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span><span class="kw">as.complex</span>(v))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>x</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">S</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Tgate</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>x</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">gate=</span><span class="kw">S</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>x</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>x</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a>x &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>x</span></code></pre></div>
 <p>The corresponding circuit looks as follows</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">plot</span>(x)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">plot</span>(x)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 <p>Now the coefficients of the state <code>x</code> should be the Fourier transform of the coefficients of <code>y</code>. The QFT is unitary</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">sum</span>(x<span class="op">@</span>coefs<span class="op">*</span><span class="kw">Conj</span>(x<span class="op">@</span>coefs))</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">sum</span>(x<span class="op">@</span>coefs<span class="op">*</span><span class="kw">Conj</span>(x<span class="op">@</span>coefs))</span></code></pre></div>
 <pre><code>[1] 1+0i</code></pre>
 <p>and the coefficients match the one from the classical FFT</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">sqrt</span>(<span class="kw">sum</span>((w <span class="op">-</span><span class="st"> </span>x<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(w <span class="op">-</span><span class="st"> </span>x<span class="op">@</span>coefs)))</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">sqrt</span>(<span class="kw">sum</span>((w <span class="op">-</span><span class="st"> </span>x<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(w <span class="op">-</span><span class="st"> </span>x<span class="op">@</span>coefs)))</span></code></pre></div>
 <pre><code>[1] 3.602883e-16+0i</code></pre>
 </div>
 <div id="the-inverse" class="section level1">
 <h1>The inverse</h1>
 <p>Since the Hadamard gate is its own inverse, we need the hermitian conjugates for <code>T</code> and <code>S</code></p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">Tdagger &lt;-<span class="st"> </span><span class="cf">function</span>(bit) {</a>
-<a class="sourceLine" id="cb8-2" title="2">  <span class="kw">return</span>(methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>,</a>
-<a class="sourceLine" id="cb8-3" title="3">                      <span class="dt">bit=</span><span class="kw">as.integer</span>(bit),</a>
-<a class="sourceLine" id="cb8-4" title="4">                      <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="fl">1.</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="kw">exp</span>(<span class="op">-</span>1i<span class="op">*</span>pi<span class="op">/</span><span class="dv">4</span>))), <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)),</a>
-<a class="sourceLine" id="cb8-5" title="5">                      <span class="dt">type=</span><span class="st">&quot;Tdag&quot;</span>))</a>
-<a class="sourceLine" id="cb8-6" title="6">}</a>
-<a class="sourceLine" id="cb8-7" title="7">Sdagger &lt;-<span class="st"> </span><span class="cf">function</span>(bit) {</a>
-<a class="sourceLine" id="cb8-8" title="8">  <span class="kw">return</span>(methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>,</a>
-<a class="sourceLine" id="cb8-9" title="9">                      <span class="dt">bit=</span><span class="kw">as.integer</span>(bit),</a>
-<a class="sourceLine" id="cb8-10" title="10">                      <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="op">-</span>1i)), <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)),</a>
-<a class="sourceLine" id="cb8-11" title="11">                      <span class="dt">type=</span><span class="st">&quot;Sdag&quot;</span>))</a>
-<a class="sourceLine" id="cb8-12" title="12">}</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>Tdagger &lt;-<span class="st"> </span><span class="cf">function</span>(bit) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>  <span class="kw">return</span>(methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>                      <span class="dt">bit=</span><span class="kw">as.integer</span>(bit),</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>                      <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="fl">1.</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="kw">exp</span>(<span class="op">-</span>1i<span class="op">*</span>pi<span class="op">/</span><span class="dv">4</span>))), <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)),</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a>                      <span class="dt">type=</span><span class="st">&quot;Tdag&quot;</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a>}</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a>Sdagger &lt;-<span class="st"> </span><span class="cf">function</span>(bit) {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true"></a>  <span class="kw">return</span>(methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true"></a>                      <span class="dt">bit=</span><span class="kw">as.integer</span>(bit),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true"></a>                      <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="op">-</span>1i)), <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)),</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true"></a>                      <span class="dt">type=</span><span class="st">&quot;Sdag&quot;</span>))</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true"></a>}</span></code></pre></div>
 <div id="inverting-the-circuit" class="section level2">
 <h2>Inverting the circuit</h2>
 <p>With these we can write the inverse QFT as follows, again for three qubits</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1">z &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span>x<span class="op">@</span>coefs)</a>
-<a class="sourceLine" id="cb9-2" title="2">z &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>z</a>
-<a class="sourceLine" id="cb9-3" title="3">z &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>z</a>
-<a class="sourceLine" id="cb9-4" title="4">z &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>z</a>
-<a class="sourceLine" id="cb9-5" title="5">z &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>z</a>
-<a class="sourceLine" id="cb9-6" title="6">z &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Tdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>z</a>
-<a class="sourceLine" id="cb9-7" title="7">z &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>z</a>
-<a class="sourceLine" id="cb9-8" title="8">z &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>z</a></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1"><span class="kw">plot</span>(z)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span>x<span class="op">@</span>coefs)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>z</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>z</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>z</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>z</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Tdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>z</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>z</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a>z &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>z</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">plot</span>(z)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 <p>The coefficients can be compared with the original vector we started from</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1"><span class="kw">sqrt</span>(<span class="kw">sum</span>((v <span class="op">-</span><span class="st"> </span>z<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(v <span class="op">-</span><span class="st"> </span>z<span class="op">@</span>coefs)))</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">sqrt</span>(<span class="kw">sum</span>((v <span class="op">-</span><span class="st"> </span>z<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(v <span class="op">-</span><span class="st"> </span>z<span class="op">@</span>coefs)))</span></code></pre></div>
 <pre><code>[1] 2.058409e-16+0i</code></pre>
 </div>
 <div id="inverting-the-phase" class="section level2">
 <h2>Inverting the phase</h2>
 <p>Instead of inverting the circuit we can of course apply the usual inverse Fourier trafo, i.e. utilise the same circuit as for the original QFT with all phases reversed.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1">y &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span>x<span class="op">@</span>coefs)</a>
-<a class="sourceLine" id="cb13-2" title="2">y &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb13-3" title="3">y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb13-4" title="4">y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Tdagger</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb13-5" title="5">y &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb13-6" title="6">y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb13-7" title="7">y &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb13-8" title="8">y &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb13-9" title="9"></a>
-<a class="sourceLine" id="cb13-10" title="10"><span class="kw">plot</span>(y)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span>x<span class="op">@</span>coefs)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">3</span>) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">3</span>), <span class="dt">gate=</span><span class="kw">Tdagger</span>(<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">2</span>) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="dt">gate=</span><span class="kw">Sdagger</span>(<span class="dv">2</span>)) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">H</span>(<span class="dv">1</span>) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a><span class="kw">plot</span>(y)</span></code></pre></div>
 <p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
 <p>Again we get the vector <code>v</code> back we started with.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" title="1"><span class="kw">sqrt</span>(<span class="kw">sum</span>((v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)))</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="kw">sqrt</span>(<span class="kw">sum</span>((v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)))</span></code></pre></div>
 <pre><code>[1] 2.058409e-16+0i</code></pre>
 </div>
 <div id="the-general-case" class="section level2">
@@ -407,42 +445,42 @@ R_k =
 0 &amp; \exp(2\pi \mathrm{i}/2^k) \\
 \end{pmatrix}
 \]</span> Such a general gate is easily implemented in <code>qsimulatR</code> as follows</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1">Ri &lt;-<span class="st"> </span><span class="cf">function</span>(bit, i, <span class="dt">sign=</span><span class="op">+</span><span class="dv">1</span>) {</a>
-<a class="sourceLine" id="cb16-2" title="2">  type &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;R&quot;</span>, i)</a>
-<a class="sourceLine" id="cb16-3" title="3">  <span class="cf">if</span>(sign <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>) {</a>
-<a class="sourceLine" id="cb16-4" title="4">    type &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;R&quot;</span>, i, <span class="st">&quot;dag&quot;</span>)</a>
-<a class="sourceLine" id="cb16-5" title="5">  }</a>
-<a class="sourceLine" id="cb16-6" title="6">  <span class="kw">return</span>(methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>,</a>
-<a class="sourceLine" id="cb16-7" title="7">                      <span class="dt">bit=</span><span class="kw">as.integer</span>(bit),</a>
-<a class="sourceLine" id="cb16-8" title="8">                      <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="kw">exp</span>(sign<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>1i<span class="op">/</span><span class="dv">2</span><span class="op">^</span>i))),</a>
-<a class="sourceLine" id="cb16-9" title="9">                              <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)), <span class="dt">type=</span>type))</a>
-<a class="sourceLine" id="cb16-10" title="10">}</a></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a>Ri &lt;-<span class="st"> </span><span class="cf">function</span>(bit, i, <span class="dt">sign=</span><span class="op">+</span><span class="dv">1</span>) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a>  type &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;R&quot;</span>, i)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true"></a>  <span class="cf">if</span>(sign <span class="op">&lt;</span><span class="st"> </span><span class="dv">0</span>) {</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true"></a>    type &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;R&quot;</span>, i, <span class="st">&quot;dag&quot;</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true"></a>  }</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true"></a>  <span class="kw">return</span>(methods<span class="op">::</span><span class="kw">new</span>(<span class="st">&quot;sqgate&quot;</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true"></a>                      <span class="dt">bit=</span><span class="kw">as.integer</span>(bit),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true"></a>                      <span class="dt">M=</span><span class="kw">array</span>(<span class="kw">as.complex</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="kw">exp</span>(sign<span class="op">*</span><span class="dv">2</span><span class="op">*</span>pi<span class="op">*</span>1i<span class="op">/</span><span class="dv">2</span><span class="op">^</span>i))),</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true"></a>                              <span class="dt">dim=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>)), <span class="dt">type=</span>type))</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true"></a>}</span></code></pre></div>
 <p>With this gate we can implement the quantum Fourier trafo function (the following function is almost identical to the <code>qft</code> function included in <code>qsimulatR</code>, see <code>?qft</code> for details)</p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1">qft &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">inverse=</span><span class="ot">FALSE</span>) {</a>
-<a class="sourceLine" id="cb17-2" title="2">  n &lt;-<span class="st"> </span>x<span class="op">@</span>nbits</a>
-<a class="sourceLine" id="cb17-3" title="3">  y &lt;-<span class="st"> </span>x</a>
-<a class="sourceLine" id="cb17-4" title="4">  sign &lt;-<span class="st"> </span><span class="op">+</span><span class="dv">1</span></a>
-<a class="sourceLine" id="cb17-5" title="5">  <span class="cf">if</span>(inverse) sign &lt;-<span class="st"> </span><span class="dv">-1</span></a>
-<a class="sourceLine" id="cb17-6" title="6">  <span class="cf">for</span>(bit <span class="cf">in</span> <span class="kw">c</span>(n<span class="op">:</span><span class="dv">1</span>)) {</a>
-<a class="sourceLine" id="cb17-7" title="7">    y &lt;-<span class="st"> </span><span class="kw">H</span>(bit) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb17-8" title="8">    <span class="cf">if</span>(bit <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) {</a>
-<a class="sourceLine" id="cb17-9" title="9">      <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>((bit<span class="dv">-1</span>)<span class="op">:</span><span class="dv">1</span>)) {</a>
-<a class="sourceLine" id="cb17-10" title="10">        y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(i, bit), <span class="dt">gate=</span><span class="kw">Ri</span>(bit, bit<span class="op">-</span>(i<span class="dv">-1</span>), <span class="dt">sign=</span>sign)) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb17-11" title="11">      }</a>
-<a class="sourceLine" id="cb17-12" title="12">    }</a>
-<a class="sourceLine" id="cb17-13" title="13">  }</a>
-<a class="sourceLine" id="cb17-14" title="14">  <span class="co">## reverse order</span></a>
-<a class="sourceLine" id="cb17-15" title="15">  <span class="cf">for</span>(k <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">floor</span>(n<span class="op">/</span><span class="dv">2</span>))) {</a>
-<a class="sourceLine" id="cb17-16" title="16">    y &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(k, n<span class="op">-</span>(k<span class="dv">-1</span>))) <span class="op">*</span><span class="st"> </span>y</a>
-<a class="sourceLine" id="cb17-17" title="17">  }</a>
-<a class="sourceLine" id="cb17-18" title="18">  <span class="kw">return</span>(<span class="kw">invisible</span>(y))</a>
-<a class="sourceLine" id="cb17-19" title="19">}</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>qft &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">inverse=</span><span class="ot">FALSE</span>) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>  n &lt;-<span class="st"> </span>x<span class="op">@</span>nbits</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>  y &lt;-<span class="st"> </span>x</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>  sign &lt;-<span class="st"> </span><span class="op">+</span><span class="dv">1</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>  <span class="cf">if</span>(inverse) sign &lt;-<span class="st"> </span><span class="dv">-1</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a>  <span class="cf">for</span>(bit <span class="cf">in</span> <span class="kw">c</span>(n<span class="op">:</span><span class="dv">1</span>)) {</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true"></a>    y &lt;-<span class="st"> </span><span class="kw">H</span>(bit) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true"></a>    <span class="cf">if</span>(bit <span class="op">&gt;</span><span class="st"> </span><span class="dv">1</span>) {</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true"></a>      <span class="cf">for</span>(i <span class="cf">in</span> <span class="kw">c</span>((bit<span class="dv">-1</span>)<span class="op">:</span><span class="dv">1</span>)) {</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true"></a>        y &lt;-<span class="st"> </span><span class="kw">cqgate</span>(<span class="dt">bits=</span><span class="kw">c</span>(i, bit), <span class="dt">gate=</span><span class="kw">Ri</span>(bit, bit<span class="op">-</span>(i<span class="dv">-1</span>), <span class="dt">sign=</span>sign)) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true"></a>      }</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true"></a>    }</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true"></a>  }</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true"></a>  <span class="co">## reverse order</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true"></a>  <span class="cf">for</span>(k <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span><span class="op">:</span><span class="kw">floor</span>(n<span class="op">/</span><span class="dv">2</span>))) {</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true"></a>    y &lt;-<span class="st"> </span><span class="kw">SWAP</span>(<span class="kw">c</span>(k, n<span class="op">-</span>(k<span class="dv">-1</span>))) <span class="op">*</span><span class="st"> </span>y</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true"></a>  }</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true"></a>  <span class="kw">return</span>(<span class="kw">invisible</span>(y))</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true"></a>}</span></code></pre></div>
 <p>And we can plot and check the result again</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1">y &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span>x<span class="op">@</span>coefs)</a>
-<a class="sourceLine" id="cb18-2" title="2">y &lt;-<span class="st"> </span><span class="kw">qft</span>(y, <span class="dt">inverse=</span><span class="ot">TRUE</span>)</a>
-<a class="sourceLine" id="cb18-3" title="3"><span class="kw">plot</span>(y)</a></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">qstate</span>(N, <span class="dt">coefs=</span>x<span class="op">@</span>coefs)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>y &lt;-<span class="st"> </span><span class="kw">qft</span>(y, <span class="dt">inverse=</span><span class="ot">TRUE</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a><span class="kw">plot</span>(y)</span></code></pre></div>
 <p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAACu1BMVEUAAAABAQECAgIDAwMEBAQFBQUGBgYHBwcICAgJCQkLCwsMDAwNDQ0ODg4PDw8QEBARERESEhITExMUFBQVFRUWFhYXFxcYGBgZGRkaGhobGxscHBwdHR0eHh4fHx8gICAhISEiIiIjIyMkJCQlJSUmJiYnJycoKCgpKSkrKyssLCwuLi4vLy8wMDAxMTEyMjIzMzM0NDQ2NjY3Nzc4ODg5OTk6Ojo7Ozs8PDw+Pj4/Pz9AQEBBQUFCQkJERERFRUVHR0dISEhJSUlKSkpLS0tMTExNTU1OTk5PT09QUFBRUVFSUlJTU1NUVFRVVVVWVlZXV1dYWFhZWVlbW1tcXFxdXV1eXl5gYGBhYWFiYmJjY2NkZGRlZWVmZmZnZ2doaGhpaWlqampsbGxubm5vb29wcHBxcXFycnJzc3N0dHR1dXV2dnZ3d3d4eHh5eXl6enp7e3t8fHx9fX1+fn5/f3+BgYGCgoKDg4OEhISFhYWHh4eIiIiJiYmKioqLi4uMjIyOjo6Pj4+QkJCRkZGSkpKTk5OUlJSWlpaYmJiZmZmampqbm5ucnJyenp6goKChoaGioqKjo6OkpKSlpaWmpqanp6eoqKipqamqqqqrq6usrKytra2vr6+wsLCxsbGysrKzs7O0tLS1tbW2tra3t7e4uLi5ubm6urq7u7u8vLy9vb2+vr7AwMDBwcHCwsLDw8PExMTFxcXHx8fIyMjJycnKysrLy8vMzMzNzc3Ozs7Pz8/Q0NDR0dHS0tLT09PU1NTW1tbX19fY2NjZ2dna2trb29vc3Nzd3d3e3t7f39/g4ODh4eHj4+Pk5OTl5eXm5ubn5+fo6Ojp6enq6urr6+vs7Ozt7e3u7u7v7+/w8PDx8fHy8vLz8/P09PT19fX29vb39/f4+Pj5+fn6+vr7+/v8/Pz9/f3+/v7///+agH6gAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAJfklEQVR4nO3b/38T9QHH8U+ghRboVoqttoDA7ArKphswtzGGE1FRtIJf0K0TYbRg/TLUORHrWpShdTIKUyh0AwTUMjp0Y85NBxMdFDZm7b6gA4Mr5Us+f8buc7kkl1zu3kmuCZd7vF8/tMndp3e95+ORu/Q+jZDMMXGhfwGvRyAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAuU10D+ebrLrxYHaR14DrZ38kF2B8wO0j7wGerEu+fKmVXJQHFD/7W9mug9fAvVOWhkH1D9n7plM9+FLIE3I/BJz4+MxoND7v377dArjDnftOyUdgGSveDL62JWPp4DOr64SQpQs/i8Yt/4ybZi4oycGdOuX9W9/FjsiYwZNWmk8cufjJaBztSJcda/juCXGsKoPnIB6DCGXPl4CelZEmuU0rCM67EsvOACd79WF3Pp4CCg0Jnrk4i8O46bGhtU7AalrmXsfDwEdih24WGM/7DPTsGsdgTShJ1z7ZBNoxYS0qjQd+efth401DSuKAkWWxID0sYGC8ZYNOL5+rWURKHgkrV41HfnD9sPeNQ27Ogo0rkPVbAI6fOTIBzMvLr/fsgF0jUzIOy+x/pGxI/+Nw7jq2LA6x5eYdv6586fRq32meQdI1kcP/PJzDsOao8Mqn3MCUufnBW29boU8BHTiCuPAK/7gNKx/egRop9P7oD51fl7QJt0KeQhIHp+nH/eV7zgPO3WfPqy6y/Gd9I3q+qUBuRXyEpCU3T8re2RfCA77cN34RV3npANQf+BmdX1XQC6FvAWknYIPpTRsRpf6avvHav+cgP43rw7kTsiXQNr5OXw/KAzkSsiXQI/OPRMHJD+sdnrj4Fh+A317c9Jebt8ciAOS/Rnfos5roLdrbfuuPiwKlHl5DQQjEIhAIN8CddZWj7Zpon6KKZ9uf/pRvRHemm+BHq8tbkt+gUqtG5rDW/Mv0OMlJ91spZFAzhEI5Augvp0tT3VY7n9agB4N3yKac1A9WTN1eE3zWWNN6yjbbfsBaP3F6sDLVibcPLQCFXZ0dLQ3lY0NSrlCLNvxcMFjxhp/Az0TuS34/fjlVqAi/dsG0Sn7S5Zoj+4vNkx9DXQ4duf91bgVdkAHRLs8oiGpmdWj8tTC0aMXPasBfVp/WdGEFSEpzy+/dOwPG24yfij/gZbHgG6KW2EHtEkck6e71V2wpcV9ckbJqi3Th2tAc0tbtteLl6VcUvrCliuH5hfQ/xwmwb4RA6qIWzFuj/q6xHwO2rp16y9/ctF9xvNfFDwgu8R2KU9XaUC3tGqLah6UHw3RkHoKokDGxNrNLdZdf5zeUVygmdWhMaBA3IrCMepraeJVTFQd0J/9+y5x91nZVKoeN+jnoOC7awsb5TahncPllChQWXhrIy6y7vra9I7iAr3EZseAxsWtsHmJ/e1rl6p7+TvLx2/VvjVcoZat0oB+OzlQOauyUT5XrJZcn18vMadaYkD3xK2wOwdtFD2az+DFfepJ80j19ZFR8pPCxf+SclqjduZW/3E2zT9AH5dHgfbHrbAD6hQH5dnKu8LL9qrpnXMTR2lLu7V3nJc0yqODN0nZO8Q/QPL1iM/z8cvtgN4Se+Ue8eA6lXYV+9yabbPGjJJ/L6x9c9vUYdcdlwvLfr5tatVc44d8ACT3X6N4rtqdsNgOKBiYLVsN03/K4L1jLrl3h3YO2lQzbMorbaU/kmeWVkx86TsLjB/yA5B2RVp24zHLwgz/WA22apsKjYtMf/kDSD6/yLosQ6DQ2Nndnzwx5CPjKYEsvXOVCHzxtcgzAiXpZDD22P9AXx/aYPtBnhSa4neg95pqZ9k0z/YjYub+Gt6ab4EGKgKBCATyNlBP9chCawG9AvVw8KAkqwtij0ckuU+yN61fwdtA71XPe8pyu2r/cIfbaLjrN6ay56ORyZIoUPeJTI8im0CX11k/e3yyxNU256cEtHryf8IPIkD7yv+U6R59CSQfmxT+yJkB9MeK7Rnv0Z9AEaEwkBufHAHFpkdjQOYp02DD+GFf2RJZ4zDhlSqQIaQDufLJFVB0etQEZJoyvXPEM7vuEbuNNQMBFBZSQO58cgVUpH/bIDpNQNFl8kRgvZShmruNNQMCpAtpQC59cgt0QLRbgNSU6aFvdWuPvnmbhFOmaQApoQVtbn1yC7RJHLMAqSlTVWhX8QYJp0zTAdKEan/s1iebQK+Yz0GR6VHzOcg8Zbq6SDRIPGU6vz6d/8S7paj4IcvC36V3FFkEejLxKqamRxOvYpEp06O/eqCwBU+Zzp/m/M+b8c0cPPQGy8Jl6R1FLl9iano08SVmTJmqln4BT5mm9RLTzj+Rd4yZl9Nz0EbRYzkHqSnTLdcppLXiMzhlmg6Qfn52LZRToE5x0AKkpkx3CfUhzO+NxlOmaQAZ1y+3QjkFekvstQCpKdMzV09Y91rjoFYJp0xTB4pe310K5RQoGJhtAVJTpvLTuprhX31JPQNTpikDmd7/uBPy+h+rCVOmqQLFvT90JeR1oIQp0xSBEt4/uxHyOlDClGlqQL8v3xW/YPnk42nuNprngeKnTFMD2vB64pKW/cnGpVIWgd4fVjVpZmIzCiyL0qlic/Z+3+RlESj0RvvT1n5Qp7WwKckaS227Le3py97vmzyvfZjFcxEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUAEAhEIRCAQgUD/B2GUN0UzxDAnAAAAAElFTkSuQmCC" style="display: block; margin: auto;" /></p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="kw">sqrt</span>(<span class="kw">sum</span>((v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)))</a></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a><span class="kw">sqrt</span>(<span class="kw">sum</span>((v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)<span class="op">*</span><span class="kw">Conj</span>(v <span class="op">-</span><span class="st"> </span>y<span class="op">@</span>coefs)))</span></code></pre></div>
 <pre><code>[1] 2.067318e-16+0i</code></pre>
 </div>
 </div>
